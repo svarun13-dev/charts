@@ -1,92 +1,221 @@
-# 🧠 Generative AI Project Template
+# Technical Analysis Charting Tool
 
-A production-ready template to help you kickstart and organize your Generative AI projects with clarity and scalability in mind.  
-Designed to reduce chaos in early development and support long-term maintainability with proven structure and practices.
+A professional-grade technical analysis charting application built with React and TradingView's Lightweight Charts library. This tool provides real-time cryptocurrency price data with advanced technical indicators and automated pattern detection.
 
-[![Follow @HeyNina101](https://img.shields.io/badge/Follow-%40HeyNina101-1da1f2?style=flat&logo=github)](https://github.com/HeyNina101)
+## Features
 
-[![Star this repo](https://img.shields.io/badge/⭐%20Star-generative__ai__project-ffcc00?style=flat&logo=github)](https://github.com/HeyNina101/generative_ai_project)
+### Core Features
+- **Interactive Candlestick Charts**: Fully interactive charts with zoom and pan capabilities
+- **Multiple Timeframes**: Support for 1m, 5m, 15m, 1h, 4h, and 1d intervals
+- **Real-time Data**: Live price updates via Binance WebSocket
+- **Volume Analysis**: Volume chart with color-coded bars and volume profile sidebar
 
+### Technical Indicators
+- **Moving Averages**: 20/50/200 EMA with toggle controls
+- **Bollinger Bands**: 20-period BB with 2 standard deviations
+- **Auto Fibonacci Retracements**: Automatically drawn between swing highs and lows (0%, 23.6%, 38.2%, 50%, 61.8%, 78.6%, 100%)
+- **Support/Resistance Levels**: Automatically detected from price action
 
----
+### Technical Analysis Tools
+- **Swing High/Low Detection**: Algorithmic detection of pivot points
+- **Volume Profile**: Visual representation of volume distribution across price levels
+- **Dark Theme**: Professional trading interface with dark color scheme
 
-## 📋 Project Overview
+## Tech Stack
 
-A production-ready template for building scalable Generative AI apps — structured, maintainable, and built on real-world best practices.
+- **Frontend**: React 18 + TypeScript
+- **Build Tool**: Vite
+- **Charts**: Lightweight Charts 4.x (TradingView's open-source library)
+- **Data Source**: Binance API (REST + WebSocket)
+- **HTTP Client**: Axios
 
----
-
-## 🔧 Key Components
-
-```
-
-📁 config/ → YAML config for models, prompts, logging
-📁 data/ → Prompts, embeddings, and other dynamic content
-📁 examples/ → Minimal scripts to test key features
-📁 notebooks/ → Quick experiments and prototyping
-📁 tests/ → Unit, integration, and end-to-end tests
-
-📁 src/ → The core engine — all logic lives here:
-├── agents/ → Agent classes: planner, executor, base agent
-├── memory/ → Short-term and long-term memory modules
-├── pipelines/ → Chat flows, doc processing, and task routing
-├── retrieval/ → Vector search and document lookup
-├── skills/ → Extra abilities: web search, code execution
-├── vision_audio/ → Multimodal processing: image and audio
-├── prompt_engineering/→ Prompt chaining, templates, few-shot logic
-├── llm/ → OpenAI, Anthropic, and custom LLM routing
-├── fallback/ → Recovery logic when LLMs fail
-├── guardrails/ → PII filters, output validation, safety checks
-├── handlers/ → Input/output processing and error management
-└── utils/ → Logging, caching, rate limiting, token counting
+## Project Structure
 
 ```
----
+frontend/
+├── src/
+│   ├── components/
+│   │   ├── TradingChart.tsx    # Main chart component
+│   │   └── TradingChart.css    # Chart styling
+│   ├── services/
+│   │   └── binanceApi.ts       # Binance API integration
+│   ├── utils/
+│   │   └── indicators.ts       # Technical indicator calculations
+│   ├── types/
+│   │   └── index.ts            # TypeScript type definitions
+│   ├── App.tsx                 # Main app component
+│   └── main.tsx                # Entry point
+├── package.json
+└── vite.config.ts
+```
 
-## ⚡ Best Practices
+## Installation
 
-- Track prompt versions and results  
-- Separate configs using YAML files  
-- Structure code by clear module boundaries  
-- Cache responses to reduce latency and cost  
-- Handle errors with custom exceptions  
-- Use notebooks for rapid testing and iteration  
-- Monitor API usage and set rate limits  
-- Keep code and docs in sync  
+1. **Clone the repository**:
+   ```bash
+   git clone <repository-url>
+   cd charts
+   ```
 
----
+2. **Install dependencies**:
+   ```bash
+   cd frontend
+   npm install
+   ```
 
-## 🧭 Getting Started
+3. **Start the development server**:
+   ```bash
+   npm run dev
+   ```
 
-1. Clone the repo  
-2. Install via `requirements.txt`  
-3. Set up model configs  
-4. Check sample code  
-5. Begin in notebooks  
+4. **Open your browser**:
+   Navigate to `http://localhost:5173`
 
----
+## Usage
 
-## 💡 Development Tips
+### Changing Timeframes
+Click on any timeframe button (1m, 5m, 15m, 1h, 4h, 1d) in the top control panel to switch chart intervals.
 
-- Use modular structure  
-- Test components early  
-- Track with version control  
-- Keep datasets fresh  
-- Monitor API usage  
+### Toggling Indicators
+Use the checkboxes in the control panel to show/hide:
+- EMA 20 (Blue line)
+- EMA 50 (Orange line)
+- EMA 200 (Pink line)
+- Bollinger Bands (Purple lines)
+- Fibonacci Retracements (Rainbow-colored horizontal lines)
+- Support/Resistance Levels (Orange dashed lines)
 
----
+### Chart Interaction
+- **Zoom**: Scroll up/down or pinch on mobile
+- **Pan**: Click and drag on the chart
+- **Crosshair**: Hover over the chart to see price and time details
+- **Volume Profile**: View on the right sidebar showing volume distribution
 
-## 📁 Core Files
+## Technical Details
 
-- `requirements.txt` – Package dependencies  
-- `README.md` – Project overview and usage  
-- `Dockerfile` – Container build instructions  
+### Indicators Implementation
 
----
+#### Exponential Moving Average (EMA)
+```typescript
+EMA = (Close - Previous EMA) × Multiplier + Previous EMA
+Multiplier = 2 / (Period + 1)
+```
 
-## 📄 License
+#### Bollinger Bands
+```typescript
+Middle Band = 20-period SMA
+Upper Band = Middle Band + (2 × Standard Deviation)
+Lower Band = Middle Band - (2 × Standard Deviation)
+```
 
-This project is licensed under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0).  
-You are free to use, modify, and distribute with minimal restriction.
+#### Fibonacci Levels
+Automatically calculated between most recent swing high and swing low:
+- 0% (High)
+- 23.6% Retracement
+- 38.2% Retracement
+- 50% Retracement
+- 61.8% Retracement (Golden Ratio)
+- 78.6% Retracement
+- 100% (Low)
 
----
+#### Support/Resistance Detection
+- Detects price levels with multiple touches
+- Tolerance: 0.2% price range
+- Minimum 2 touches required
+- Shows top 5 strongest levels
+
+### Data Sources
+
+#### REST API
+Fetches historical candlestick data from Binance:
+```
+GET https://api.binance.com/api/v3/klines
+```
+
+#### WebSocket
+Real-time price updates:
+```
+wss://stream.binance.com:9443/ws/{symbol}@kline_{interval}
+```
+
+## Build for Production
+
+```bash
+npm run build
+```
+
+The production build will be in the `dist/` directory.
+
+To preview the production build:
+```bash
+npm run preview
+```
+
+## Configuration
+
+### Changing Symbol
+Edit `src/App.tsx`:
+```typescript
+<TradingChart symbol="ETHUSDT" initialTimeframe="1h" />
+```
+
+### Adjusting Indicator Parameters
+Edit `src/utils/indicators.ts` to modify:
+- EMA periods
+- Bollinger Band periods and standard deviations
+- Swing detection sensitivity
+- Support/Resistance tolerance
+- Fibonacci levels
+
+## Performance Optimization
+
+- Efficient candle updates using WebSocket
+- Debounced indicator recalculation
+- Optimized chart rendering with Lightweight Charts
+- Minimal re-renders using React hooks
+
+## Browser Support
+
+- Chrome/Edge (latest)
+- Firefox (latest)
+- Safari (latest)
+- Mobile browsers (iOS Safari, Chrome Mobile)
+
+## Troubleshooting
+
+### Chart not loading
+- Check browser console for errors
+- Verify Binance API is accessible
+- Ensure WebSocket connections are not blocked by firewall
+
+### Indicators not showing
+- Make sure you have enough historical data (EMAs require minimum periods)
+- Toggle indicators on using checkboxes
+- Check if data is loading from Binance
+
+## Future Enhancements
+
+Potential features to add:
+- VWAP (Volume Weighted Average Price)
+- Ichimoku Clouds
+- RSI (Relative Strength Index)
+- MACD (Moving Average Convergence Divergence)
+- Drawing tools (trendlines, horizontal lines)
+- Multiple symbol comparison
+- Alert system
+- Save/load chart layouts
+- Export chart as image
+
+## License
+
+This project is licensed under the Apache 2.0 License.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## Acknowledgments
+
+- [Lightweight Charts](https://tradingview.github.io/lightweight-charts/) by TradingView
+- [Binance API](https://binance-docs.github.io/apidocs/) for market data
+- Technical analysis concepts from traditional trading theory

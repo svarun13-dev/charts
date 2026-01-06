@@ -10,39 +10,30 @@ import {
   detectSwingPoints,
   calculateFibonacciLevels,
   getLatestFibonacci,
-  calculateVolumeProfile,
 } from '../utils/indicators';
 import './TradingChart.css';
 
-// Predefined coins: BTC, ETH, SOL
-const COINS = [
-  { id: 'bitcoin', symbol: 'BTC', name: 'Bitcoin' },
-  { id: 'ethereum', symbol: 'ETH', name: 'Ethereum' },
-  { id: 'solana', symbol: 'SOL', name: 'Solana' },
-];
-
 interface Props {
-  initialCoinId?: string;
   initialTimeframe?: Timeframe;
 }
 
-export const TradingChart = ({ initialCoinId = 'bitcoin', initialTimeframe = '1h' }: Props) => {
+export const TradingChart = ({ initialTimeframe = '1h' }: Props) => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const volumeChartContainerRef = useRef<HTMLDivElement>(null);
-  const volumeProfileContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const volumeChartRef = useRef<IChartApi | null>(null);
   const candlestickSeriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null);
   const volumeSeriesRef = useRef<ISeriesApi<'Histogram'> | null>(null);
   const pollerRef = useRef<CoinGeckoPricePoller | null>(null);
 
-  const [coinId, setCoinId] = useState<string>(initialCoinId);
+  const coinId = 'bitcoin'; // Bitcoin only
   const [timeframe, setTimeframe] = useState<Timeframe>(initialTimeframe);
   const [candles, setCandles] = useState<Candle[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPrice, setCurrentPrice] = useState<number>(0);
-  const [chartType, setChartType] = useState<'candlestick' | 'area'>('candlestick');
   const [priceChange, setPriceChange] = useState<number>(0);
+  const [showFallingWedge, setShowFallingWedge] = useState(true);
+  const [fallingWedgeDetected, setFallingWedgeDetected] = useState(false);
 
   // Initialize charts
   useEffect(() => {
@@ -59,7 +50,7 @@ export const TradingChart = ({ initialCoinId = 'bitcoin', initialTimeframe = '1h
         horzLines: { color: '#1C1C1E', style: 1 },
       },
       width: chartContainerRef.current.clientWidth,
-      height: 600,
+      height: 400,
       timeScale: {
         timeVisible: true,
         secondsVisible: false,
@@ -105,7 +96,7 @@ export const TradingChart = ({ initialCoinId = 'bitcoin', initialTimeframe = '1h
         horzLines: { color: '#1C1C1E', style: 1 },
       },
       width: volumeChartContainerRef.current.clientWidth,
-      height: 120,
+      height: 100,
       timeScale: {
         timeVisible: false,
         borderColor: '#1C1C1E',
@@ -318,109 +309,156 @@ export const TradingChart = ({ initialCoinId = 'bitcoin', initialTimeframe = '1h
     }
   }, [candles]);
 
-  // Render volume profile
-  useEffect(() => {
-    if (!volumeProfileContainerRef.current || candles.length === 0) return;
+  // Detect falling wedge pattern
+  const detectFallingWedge = (candles: Candle[]) => {
+    if (candles.length < 20) return null;
 
-    const volumeProfile = calculateVolumeProfile(candles);
-    const maxVolume = Math.max(...volumeProfile.map((v) => v.volume));
+    // Find higher lows and lower highs
+    const lows: { index: number; price: number }[] = [];
+    const highs: { index: number; price: number }[] = [];
 
-    volumeProfileContainerRef.current.innerHTML = '';
+    for (let i = 5; i < candles.length - 5; i++) {
+      // Check if it's a local low
+      const isLow = candles.slice(i - 5, i).every(c => c.low >= candles[i].low) &&
+                    candles.slice(i + 1, i + 6).every(c => c.low >= candles[i].low);
+      if (isLow) {
+        lows.push({ index: i, price: candles[i].low });
+      }
 
-    const barHeight = 100 / volumeProfile.length;
-    volumeProfile.forEach((profile) => {
-      const bar = document.createElement('div');
-      bar.className = 'volume-profile-bar';
-      const width = (profile.volume / maxVolume) * 100;
-      bar.style.width = `${width}%`;
-      bar.style.height = `${barHeight}%`;
-      bar.title = `${profile.price.toFixed(2)}: ${profile.volume.toFixed(0)}`;
-      volumeProfileContainerRef.current!.appendChild(bar);
-    });
-  }, [candles]);
+      // Check if it's a local high
+      const isHigh = candles.slice(i - 5, i).every(c => c.high <= candles[i].high) &&
+                     candles.slice(i + 1, i + 6).every(c => c.high <= candles[i].high);
+      if (isHigh) {
+        highs.push({ index: i, price: candles[i].high });
+      }
+    }
 
-  const handleCoinChange = (coin: typeof COINS[0]) => {
-    setCoinId(coin.id);
+    if (lows.length < 2 || highs.length < 2) return null;
+
+    // Get last 2 lows and highs
+    const recentLows = lows.slice(-2);
+    const recentHighs = highs.slice(-2);
+
+    // Check for higher lows (support line going up)
+    const lowsRising = recentLows[1].price > recentLows[0].price;
+
+    // Check for lower highs (resistance line going down)
+    const highsFalling = recentHighs[1].price < recentHighs[0].price;
+
+    // Check for converging lines
+    const lowSlope = (recentLows[1].price - recentLows[0].price) / (recentLows[1].index - recentLows[0].index);
+    const highSlope = (recentHighs[1].price - recentHighs[0].price) / (recentHighs[1].index - recentHighs[0].index);
+    const isConverging = lowSlope > highSlope;
+
+    if (lowsRising && highsFalling && isConverging) {
+      return {
+        supportLine: recentLows,
+        resistanceLine: recentHighs,
+      };
+    }
+
+    return null;
   };
 
-  const selectedCoin = COINS.find((c) => c.id === coinId) || COINS[0];
+  // Draw falling wedge lines
+  useEffect(() => {
+    if (!chartRef.current || !showFallingWedge || candles.length === 0) return;
+
+    const wedge = detectFallingWedge(candles);
+    setFallingWedgeDetected(!!wedge);
+
+    if (wedge) {
+      // Draw support line (lower trendline)
+      const supportLine = chartRef.current.addLineSeries({
+        color: '#00FF88',
+        lineWidth: 2,
+        lineStyle: 0,
+        title: 'Support',
+        priceLineVisible: false,
+        lastValueVisible: false,
+      });
+
+      const supportSlope = (wedge.supportLine[1].price - wedge.supportLine[0].price) /
+                           (wedge.supportLine[1].index - wedge.supportLine[0].index);
+      const supportData: LineData[] = [
+        { time: candles[wedge.supportLine[0].index].time as Time, value: wedge.supportLine[0].price },
+        { time: candles[Math.min(candles.length - 1, wedge.supportLine[1].index + 20)].time as Time,
+          value: wedge.supportLine[1].price + supportSlope * 20 },
+      ];
+      supportLine.setData(supportData);
+
+      // Draw resistance line (upper trendline)
+      const resistanceLine = chartRef.current.addLineSeries({
+        color: '#FF3B30',
+        lineWidth: 2,
+        lineStyle: 0,
+        title: 'Resistance',
+        priceLineVisible: false,
+        lastValueVisible: false,
+      });
+
+      const resistanceSlope = (wedge.resistanceLine[1].price - wedge.resistanceLine[0].price) /
+                              (wedge.resistanceLine[1].index - wedge.resistanceLine[0].index);
+      const resistanceData: LineData[] = [
+        { time: candles[wedge.resistanceLine[0].index].time as Time, value: wedge.resistanceLine[0].price },
+        { time: candles[Math.min(candles.length - 1, wedge.resistanceLine[1].index + 20)].time as Time,
+          value: wedge.resistanceLine[1].price + resistanceSlope * 20 },
+      ];
+      resistanceLine.setData(resistanceData);
+    }
+  }, [candles, showFallingWedge]);
 
   return (
     <div className="trading-chart-container">
-      {/* Header with coin selector */}
+      {/* Header */}
       <div className="header">
-        <div className="coin-tabs">
-          {COINS.map((coin) => (
-            <button
-              key={coin.id}
-              className={`coin-tab ${coinId === coin.id ? 'active' : ''}`}
-              onClick={() => handleCoinChange(coin)}
-            >
-              {coin.symbol}
-            </button>
-          ))}
+        <div className="title-section">
+          <h1 className="btc-title">BTC/USD</h1>
+          {currentPrice > 0 && (
+            <div className="price-info">
+              <span className="price-value">
+                ${currentPrice.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+                })}
+              </span>
+              <span className={`price-change-badge ${priceChange >= 0 ? 'positive' : 'negative'}`}>
+                {priceChange >= 0 ? '▲' : '▼'} {Math.abs(priceChange).toFixed(2)}%
+              </span>
+            </div>
+          )}
         </div>
-      </div>
 
-      {/* Price display */}
-      <div className="price-section">
-        <div className="coin-name">{selectedCoin.name}</div>
-        {currentPrice > 0 && (
-          <>
-            <div className="price-main">
-              ${currentPrice.toLocaleString(undefined, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-              })}
-            </div>
-            <div className={`price-change ${priceChange >= 0 ? 'positive' : 'negative'}`}>
-              {priceChange >= 0 ? '▲' : '▼'} {Math.abs(priceChange).toFixed(2)}%
-            </div>
-          </>
+        {fallingWedgeDetected && (
+          <div className="pattern-alert">
+            ⚠️ Falling Wedge Detected (Bullish Signal)
+          </div>
         )}
       </div>
 
       {/* Chart controls */}
       <div className="chart-controls">
-        <div className="chart-type-selector">
-          <button
-            className={`chart-type-btn ${chartType === 'candlestick' ? 'active' : ''}`}
-            onClick={() => setChartType('candlestick')}
-            title="Candlestick"
-          >
-            📊
-          </button>
-          <button
-            className={`chart-type-btn ${chartType === 'area' ? 'active' : ''}`}
-            onClick={() => setChartType('area')}
-            title="Area Chart"
-          >
-            📈
-          </button>
+        <div className="timeframe-selector">
+          {(['1h', '4h', '1d'] as Timeframe[]).map((tf) => (
+            <button
+              key={tf}
+              className={`timeframe-btn ${timeframe === tf ? 'active' : ''}`}
+              onClick={() => setTimeframe(tf)}
+            >
+              {tf.toUpperCase()}
+            </button>
+          ))}
         </div>
 
-        <div className="timeframe-selector">
-          {(['1h', '1d', '1w', '1m', '3m', 'all'] as any[]).map((tf) => {
-            // Map display labels to actual timeframes
-            const timeframeMap: Record<string, Timeframe> = {
-              '1h': '1h',
-              '1d': '1d',
-              '1w': '1d',
-              '1m': '1d',
-              '3m': '1d',
-              'all': '1d',
-            };
-            const actualTf = timeframeMap[tf];
-            return (
-              <button
-                key={tf}
-                className={`timeframe-btn ${timeframe === actualTf && tf === '1h' ? 'active' : ''}`}
-                onClick={() => setTimeframe(actualTf)}
-              >
-                {tf.toUpperCase()}
-              </button>
-            );
-          })}
+        <div className="pattern-toggles">
+          <label className="toggle-label">
+            <input
+              type="checkbox"
+              checked={showFallingWedge}
+              onChange={(e) => setShowFallingWedge(e.target.checked)}
+            />
+            <span>Falling Wedge</span>
+          </label>
         </div>
       </div>
 

@@ -64,9 +64,16 @@ export const TradingChart = ({ initialCoinId = 'bitcoin', initialTimeframe = '1h
         timeVisible: true,
         secondsVisible: false,
         borderColor: '#1C1C1E',
+        fixLeftEdge: false,
+        fixRightEdge: false,
       },
       rightPriceScale: {
         borderColor: '#1C1C1E',
+        autoScale: true,
+        scaleMargins: {
+          top: 0.1,
+          bottom: 0.1,
+        },
       },
       crosshair: {
         mode: 1,
@@ -100,9 +107,12 @@ export const TradingChart = ({ initialCoinId = 'bitcoin', initialTimeframe = '1h
       timeScale: {
         timeVisible: false,
         borderColor: '#1C1C1E',
+        fixLeftEdge: false,
+        fixRightEdge: false,
       },
       rightPriceScale: {
         borderColor: '#1C1C1E',
+        autoScale: true,
       },
     });
 
@@ -234,6 +244,12 @@ export const TradingChart = ({ initialCoinId = 'bitcoin', initialTimeframe = '1h
       color: i === 0 ? '#34C759' : c.close >= candles[i - 1].close ? '#34C759' : '#FF3B30',
     }));
     volumeSeriesRef.current.setData(volumeData);
+
+    // Auto-fit the content to display all data properly
+    chartRef.current.timeScale().fitContent();
+    if (volumeChartRef.current) {
+      volumeChartRef.current.timeScale().fitContent();
+    }
 
     // Remove all series except candlestick
     const allSeries = (chartRef.current as any).allSeries?.() || [];

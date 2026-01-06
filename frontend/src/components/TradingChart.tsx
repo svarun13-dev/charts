@@ -66,6 +66,8 @@ export const TradingChart = ({ initialCoinId = 'bitcoin', initialTimeframe = '1h
         borderColor: '#1C1C1E',
         fixLeftEdge: false,
         fixRightEdge: false,
+        barSpacing: 12,
+        minBarSpacing: 6,
       },
       rightPriceScale: {
         borderColor: '#1C1C1E',
@@ -235,6 +237,13 @@ export const TradingChart = ({ initialCoinId = 'bitcoin', initialTimeframe = '1h
       low: c.low,
       close: c.close,
     }));
+
+    // Debug logging
+    console.log(`Loading ${candles.length} candles for ${coinId}`);
+    console.log('First candle time:', new Date(candles[0].time * 1000).toISOString());
+    console.log('Last candle time:', new Date(candles[candles.length - 1].time * 1000).toISOString());
+    console.log('Time range (hours):', (candles[candles.length - 1].time - candles[0].time) / 3600);
+
     candlestickSeriesRef.current.setData(candleData);
 
     // Update volume data
@@ -246,10 +255,33 @@ export const TradingChart = ({ initialCoinId = 'bitcoin', initialTimeframe = '1h
     volumeSeriesRef.current.setData(volumeData);
 
     // Auto-fit the content to display all data properly
-    chartRef.current.timeScale().fitContent();
-    if (volumeChartRef.current) {
-      volumeChartRef.current.timeScale().fitContent();
-    }
+    // Use a small timeout to ensure data is rendered before fitting
+    setTimeout(() => {
+      if (chartRef.current && candles.length > 0) {
+        // Set visible range to show all data
+        const from = candles[0].time;
+        const to = candles[candles.length - 1].time;
+
+        chartRef.current.timeScale().setVisibleRange({
+          from: from as Time,
+          to: to as Time,
+        });
+
+        // Then fit content with some padding
+        chartRef.current.timeScale().fitContent();
+      }
+      if (volumeChartRef.current && candles.length > 0) {
+        const from = candles[0].time;
+        const to = candles[candles.length - 1].time;
+
+        volumeChartRef.current.timeScale().setVisibleRange({
+          from: from as Time,
+          to: to as Time,
+        });
+
+        volumeChartRef.current.timeScale().fitContent();
+      }
+    }, 100);
 
     // Remove all series except candlestick
     const allSeries = (chartRef.current as any).allSeries?.() || [];

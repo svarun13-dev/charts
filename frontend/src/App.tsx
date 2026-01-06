@@ -4,7 +4,7 @@ import './App.css'
 function App() {
   return (
     <div className="App">
-      <TradingChart symbol="BTCUSDT" initialTimeframe="1h" />
+      <TradingChart initialCoinId="bitcoin" initialTimeframe="1h" />
     </div>
   )
 }

@@ -67,3 +67,13 @@ export interface BinanceKline {
   10: string; // Taker buy quote asset volume
   11: string; // Ignore
 }
+
+export interface Coin {
+  id: string;
+  symbol: string;
+  name: string;
+  image?: string;
+  current_price?: number;
+  market_cap?: number;
+  total_volume?: number;
+}

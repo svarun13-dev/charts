@@ -76,6 +76,137 @@
   height: 16px;
 }
 
+/* Coin Selector */
+.coin-selector {
+  position: relative;
+  min-width: 250px;
+}
+
+.selected-coin {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 15px;
+  background-color: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.selected-coin:hover {
+  background-color: #3a3a3a;
+  border-color: #4a4a4a;
+}
+
+.coin-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.coin-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.coin-symbol {
+  font-weight: 600;
+  font-size: 16px;
+  color: #fff;
+}
+
+.coin-name {
+  font-size: 12px;
+  color: #a8a8a8;
+}
+
+.dropdown-arrow {
+  color: #a8a8a8;
+  font-size: 12px;
+}
+
+.coin-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 5px;
+  background-color: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  border-radius: 8px;
+  z-index: 1000;
+  max-height: 400px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.coin-search-input {
+  width: 100%;
+  padding: 12px 15px;
+  background-color: #1a1a1a;
+  border: none;
+  border-bottom: 1px solid #3a3a3a;
+  color: #d1d4dc;
+  font-size: 14px;
+  outline: none;
+}
+
+.coin-search-input::placeholder {
+  color: #a8a8a8;
+}
+
+.coin-list {
+  overflow-y: auto;
+  max-height: 350px;
+}
+
+.coin-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.coin-item:hover {
+  background-color: #3a3a3a;
+}
+
+.coin-icon-small {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+.coin-symbol-small {
+  font-weight: 600;
+  font-size: 14px;
+  color: #fff;
+  min-width: 60px;
+}
+
+.coin-name-small {
+  font-size: 13px;
+  color: #a8a8a8;
+}
+
+/* Price Display */
+.price-display {
+  display: flex;
+  align-items: center;
+}
+
+.price-display .price {
+  font-size: 24px;
+  font-weight: 600;
+  color: #26a69a;
+}
+
 .symbol-display {
   display: flex;
   align-items: center;

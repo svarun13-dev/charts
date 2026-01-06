@@ -1,8 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { createChart } from 'lightweight-charts';
 import type { IChartApi, ISeriesApi, CandlestickData, LineData, HistogramData, Time } from 'lightweight-charts';
-import type { Candle, Timeframe } from '../types';
-import { fetchHistoricalData, BinanceWebSocket } from '../services/binanceApi';
+import type { Candle, Timeframe, Coin } from '../types';
+import {
+  fetchHistoricalDataWithVolume,
+  fetchTopCoins,
+  searchCoins,
+  CoinGeckoPricePoller,
+} from '../services/coinGeckoApi';
 import {
   calculateEMA,
   calculateBollingerBands,
@@ -15,11 +20,11 @@ import {
 import './TradingChart.css';
 
 interface Props {
-  symbol?: string;
+  initialCoinId?: string;
   initialTimeframe?: Timeframe;
 }
 
-export const TradingChart = ({ symbol = 'BTCUSDT', initialTimeframe = '1h' }: Props) => {
+export const TradingChart = ({ initialCoinId = 'bitcoin', initialTimeframe = '1h' }: Props) => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const volumeChartContainerRef = useRef<HTMLDivElement>(null);
   const volumeProfileContainerRef = useRef<HTMLDivElement>(null);
@@ -27,8 +32,9 @@ export const TradingChart = ({ symbol = 'BTCUSDT', initialTimeframe = '1h' }: Pr
   const volumeChartRef = useRef<IChartApi | null>(null);
   const candlestickSeriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null);
   const volumeSeriesRef = useRef<ISeriesApi<'Histogram'> | null>(null);
-  const wsRef = useRef<BinanceWebSocket | null>(null);
+  const pollerRef = useRef<CoinGeckoPricePoller | null>(null);
 
+  const [coinId, setCoinId] = useState<string>(initialCoinId);
   const [timeframe, setTimeframe] = useState<Timeframe>(initialTimeframe);
   const [candles, setCandles] = useState<Candle[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,6 +42,16 @@ export const TradingChart = ({ symbol = 'BTCUSDT', initialTimeframe = '1h' }: Pr
   const [showBB, setShowBB] = useState(true);
   const [showFib, setShowFib] = useState(true);
   const [showSR, setShowSR] = useState(true);
+  const [topCoins, setTopCoins] = useState<Coin[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [showSearch, setShowSearch] = useState(false);
+  const [currentPrice, setCurrentPrice] = useState<number>(0);
+  const [selectedCoin, setSelectedCoin] = useState<Coin>({
+    id: initialCoinId,
+    symbol: 'BTC',
+    name: 'Bitcoin',
+  });
 
   // Initialize charts
   useEffect(() => {
@@ -147,35 +163,49 @@ export const TradingChart = ({ symbol = 'BTCUSDT', initialTimeframe = '1h' }: Pr
     };
   }, []);
 
-  // Fetch data and setup WebSocket
+  // Load top coins on mount
+  useEffect(() => {
+    const loadTopCoins = async () => {
+      try {
+        const coins = await fetchTopCoins(50);
+        setTopCoins(coins);
+      } catch (error) {
+        console.error('Error loading top coins:', error);
+      }
+    };
+    loadTopCoins();
+  }, []);
+
+  // Fetch data and setup polling
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
       try {
-        const data = await fetchHistoricalData(symbol, timeframe, 500);
+        const data = await fetchHistoricalDataWithVolume(coinId, timeframe);
         setCandles(data);
+        if (data.length > 0) {
+          setCurrentPrice(data[data.length - 1].close);
+        }
         setLoading(false);
 
-        // Setup WebSocket
-        if (wsRef.current) {
-          wsRef.current.disconnect();
+        // Setup price polling (30 second intervals)
+        if (pollerRef.current) {
+          pollerRef.current.stop();
         }
 
-        const ws = new BinanceWebSocket(symbol, timeframe);
-        ws.connect((newCandle) => {
+        const poller = new CoinGeckoPricePoller(coinId, 30000);
+        poller.start((price) => {
+          setCurrentPrice(price);
+          // Update the last candle's close price
           setCandles((prevCandles) => {
+            if (prevCandles.length === 0) return prevCandles;
             const lastCandle = prevCandles[prevCandles.length - 1];
-            if (lastCandle && lastCandle.time === newCandle.time) {
-              // Update existing candle
-              return [...prevCandles.slice(0, -1), newCandle];
-            } else {
-              // Add new candle
-              return [...prevCandles, newCandle];
-            }
+            const updatedCandle = { ...lastCandle, close: price };
+            return [...prevCandles.slice(0, -1), updatedCandle];
           });
         });
 
-        wsRef.current = ws;
+        pollerRef.current = poller;
       } catch (error) {
         console.error('Error loading data:', error);
         setLoading(false);
@@ -185,11 +215,41 @@ export const TradingChart = ({ symbol = 'BTCUSDT', initialTimeframe = '1h' }: Pr
     loadData();
 
     return () => {
-      if (wsRef.current) {
-        wsRef.current.disconnect();
+      if (pollerRef.current) {
+        pollerRef.current.stop();
       }
     };
-  }, [symbol, timeframe]);
+  }, [coinId, timeframe]);
+
+  // Handle coin search
+  const handleSearch = async (query: string) => {
+    setSearchQuery(query);
+    if (query.length < 2) {
+      setSearchResults([]);
+      return;
+    }
+
+    try {
+      const results = await searchCoins(query);
+      setSearchResults(results.slice(0, 10));
+    } catch (error) {
+      console.error('Error searching coins:', error);
+    }
+  };
+
+  // Select a coin
+  const handleSelectCoin = (coin: any) => {
+    setSelectedCoin({
+      id: coin.id,
+      symbol: coin.symbol.toUpperCase(),
+      name: coin.name,
+      image: coin.thumb || coin.image,
+    });
+    setCoinId(coin.id);
+    setShowSearch(false);
+    setSearchQuery('');
+    setSearchResults([]);
+  };
 
   // Update chart with data and indicators
   useEffect(() => {
@@ -230,7 +290,7 @@ export const TradingChart = ({ symbol = 'BTCUSDT', initialTimeframe = '1h' }: Pr
         lineWidth: 2,
         title: 'EMA 20',
       });
-      ema20Series.setData(ema20.map(e => ({ time: e.time as Time, value: e.value })) as LineData[]);
+      ema20Series.setData(ema20.map((e) => ({ time: e.time as Time, value: e.value })) as LineData[]);
     }
 
     if (showEMA.ema50) {
@@ -240,7 +300,7 @@ export const TradingChart = ({ symbol = 'BTCUSDT', initialTimeframe = '1h' }: Pr
         lineWidth: 2,
         title: 'EMA 50',
       });
-      ema50Series.setData(ema50.map(e => ({ time: e.time as Time, value: e.value })) as LineData[]);
+      ema50Series.setData(ema50.map((e) => ({ time: e.time as Time, value: e.value })) as LineData[]);
     }
 
     if (showEMA.ema200) {
@@ -250,7 +310,7 @@ export const TradingChart = ({ symbol = 'BTCUSDT', initialTimeframe = '1h' }: Pr
         lineWidth: 2,
         title: 'EMA 200',
       });
-      ema200Series.setData(ema200.map(e => ({ time: e.time as Time, value: e.value })) as LineData[]);
+      ema200Series.setData(ema200.map((e) => ({ time: e.time as Time, value: e.value })) as LineData[]);
     }
 
     // Add Bollinger Bands
@@ -348,14 +408,51 @@ export const TradingChart = ({ symbol = 'BTCUSDT', initialTimeframe = '1h' }: Pr
   return (
     <div className="trading-chart-container">
       <div className="controls">
+        <div className="coin-selector">
+          <div className="selected-coin" onClick={() => setShowSearch(!showSearch)}>
+            {selectedCoin.image && <img src={selectedCoin.image} alt={selectedCoin.symbol} className="coin-icon" />}
+            <div className="coin-info">
+              <span className="coin-symbol">{selectedCoin.symbol}</span>
+              <span className="coin-name">{selectedCoin.name}</span>
+            </div>
+            <span className="dropdown-arrow">▼</span>
+          </div>
+
+          {showSearch && (
+            <div className="coin-dropdown">
+              <input
+                type="text"
+                placeholder="Search coins..."
+                value={searchQuery}
+                onChange={(e) => handleSearch(e.target.value)}
+                className="coin-search-input"
+                autoFocus
+              />
+              <div className="coin-list">
+                {searchQuery.length >= 2
+                  ? searchResults.map((coin) => (
+                      <div key={coin.id} className="coin-item" onClick={() => handleSelectCoin(coin)}>
+                        {coin.thumb && <img src={coin.thumb} alt={coin.symbol} className="coin-icon-small" />}
+                        <span className="coin-symbol-small">{coin.symbol.toUpperCase()}</span>
+                        <span className="coin-name-small">{coin.name}</span>
+                      </div>
+                    ))
+                  : topCoins.slice(0, 20).map((coin) => (
+                      <div key={coin.id} className="coin-item" onClick={() => handleSelectCoin(coin)}>
+                        {coin.image && <img src={coin.image} alt={coin.symbol} className="coin-icon-small" />}
+                        <span className="coin-symbol-small">{coin.symbol.toUpperCase()}</span>
+                        <span className="coin-name-small">{coin.name}</span>
+                      </div>
+                    ))}
+              </div>
+            </div>
+          )}
+        </div>
+
         <div className="timeframe-selector">
           <label>Timeframe:</label>
           {(['1m', '5m', '15m', '1h', '4h', '1d'] as Timeframe[]).map((tf) => (
-            <button
-              key={tf}
-              className={timeframe === tf ? 'active' : ''}
-              onClick={() => setTimeframe(tf)}
-            >
+            <button key={tf} className={timeframe === tf ? 'active' : ''} onClick={() => setTimeframe(tf)}>
               {tf}
             </button>
           ))}
@@ -400,13 +497,8 @@ export const TradingChart = ({ symbol = 'BTCUSDT', initialTimeframe = '1h' }: Pr
           </label>
         </div>
 
-        <div className="symbol-display">
-          <h2>{symbol}</h2>
-          {candles.length > 0 && (
-            <span className="price">
-              ${candles[candles.length - 1].close.toFixed(2)}
-            </span>
-          )}
+        <div className="price-display">
+          {currentPrice > 0 && <span className="price">${currentPrice.toLocaleString()}</span>}
         </div>
       </div>
 

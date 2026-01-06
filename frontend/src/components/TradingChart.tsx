@@ -41,6 +41,8 @@ export const TradingChart = ({ initialCoinId = 'bitcoin', initialTimeframe = '1h
   const [candles, setCandles] = useState<Candle[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPrice, setCurrentPrice] = useState<number>(0);
+  const [chartType, setChartType] = useState<'candlestick' | 'area'>('candlestick');
+  const [priceChange, setPriceChange] = useState<number>(0);
 
   // Initialize charts
   useEffect(() => {
@@ -170,7 +172,11 @@ export const TradingChart = ({ initialCoinId = 'bitcoin', initialTimeframe = '1h
         const data = await fetchHistoricalDataWithVolume(coinId, timeframe);
         setCandles(data);
         if (data.length > 0) {
-          setCurrentPrice(data[data.length - 1].close);
+          const latestPrice = data[data.length - 1].close;
+          const firstPrice = data[0].open;
+          const change = ((latestPrice - firstPrice) / firstPrice) * 100;
+          setCurrentPrice(latestPrice);
+          setPriceChange(change);
         }
         setLoading(false);
 
@@ -300,51 +306,97 @@ export const TradingChart = ({ initialCoinId = 'bitcoin', initialTimeframe = '1h
     setCoinId(coin.id);
   };
 
+  const selectedCoin = COINS.find((c) => c.id === coinId) || COINS[0];
+
   return (
     <div className="trading-chart-container">
-      <div className="controls">
-        <div className="coin-selector-simple">
+      {/* Header with coin selector */}
+      <div className="header">
+        <div className="coin-tabs">
           {COINS.map((coin) => (
             <button
               key={coin.id}
-              className={`coin-btn ${coinId === coin.id ? 'active' : ''}`}
+              className={`coin-tab ${coinId === coin.id ? 'active' : ''}`}
               onClick={() => handleCoinChange(coin)}
             >
               {coin.symbol}
             </button>
           ))}
         </div>
+      </div>
 
-        <div className="timeframe-selector">
-          {(['1m', '5m', '15m', '1h', '4h', '1d'] as Timeframe[]).map((tf) => (
-            <button
-              key={tf}
-              className={`timeframe-btn ${timeframe === tf ? 'active' : ''}`}
-              onClick={() => setTimeframe(tf)}
-            >
-              {tf}
-            </button>
-          ))}
+      {/* Price display */}
+      <div className="price-section">
+        <div className="coin-name">{selectedCoin.name}</div>
+        {currentPrice > 0 && (
+          <>
+            <div className="price-main">
+              ${currentPrice.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+              })}
+            </div>
+            <div className={`price-change ${priceChange >= 0 ? 'positive' : 'negative'}`}>
+              {priceChange >= 0 ? '▲' : '▼'} {Math.abs(priceChange).toFixed(2)}%
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Chart controls */}
+      <div className="chart-controls">
+        <div className="chart-type-selector">
+          <button
+            className={`chart-type-btn ${chartType === 'candlestick' ? 'active' : ''}`}
+            onClick={() => setChartType('candlestick')}
+            title="Candlestick"
+          >
+            📊
+          </button>
+          <button
+            className={`chart-type-btn ${chartType === 'area' ? 'active' : ''}`}
+            onClick={() => setChartType('area')}
+            title="Area Chart"
+          >
+            📈
+          </button>
         </div>
 
-        <div className="price-display">
-          {currentPrice > 0 && (
-            <span className="price">${currentPrice.toLocaleString(undefined, {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2
-            })}</span>
-          )}
+        <div className="timeframe-selector">
+          {(['1h', '1d', '1w', '1m', '3m', 'all'] as any[]).map((tf) => {
+            // Map display labels to actual timeframes
+            const timeframeMap: Record<string, Timeframe> = {
+              '1h': '1h',
+              '1d': '1d',
+              '1w': '1d',
+              '1m': '1d',
+              '3m': '1d',
+              'all': '1d',
+            };
+            const actualTf = timeframeMap[tf];
+            return (
+              <button
+                key={tf}
+                className={`timeframe-btn ${timeframe === actualTf && tf === '1h' ? 'active' : ''}`}
+                onClick={() => setTimeframe(actualTf)}
+              >
+                {tf.toUpperCase()}
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {loading && <div className="loading">Loading...</div>}
+      {loading && <div className="loading">Loading chart data...</div>}
 
-      <div className="charts-layout">
-        <div className="main-charts">
-          <div ref={chartContainerRef} className="chart-container" />
-          <div ref={volumeChartContainerRef} className="volume-chart-container" />
-        </div>
-        <div ref={volumeProfileContainerRef} className="volume-profile-container" />
+      {/* Chart */}
+      <div className="chart-wrapper">
+        <div ref={chartContainerRef} className="chart-container" />
+      </div>
+
+      {/* Volume chart */}
+      <div className="volume-wrapper">
+        <div ref={volumeChartContainerRef} className="volume-chart-container" />
       </div>
     </div>
   );

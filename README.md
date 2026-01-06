@@ -1,13 +1,15 @@
 # Technical Analysis Charting Tool
 
-A professional-grade technical analysis charting application built with React and TradingView's Lightweight Charts library. This tool provides real-time cryptocurrency price data with advanced technical indicators and automated pattern detection.
+A professional-grade technical analysis charting application built with React and TradingView's Lightweight Charts library. This tool provides real-time cryptocurrency price data with advanced technical indicators and automated pattern detection. **Now supports thousands of cryptocurrencies via CoinGecko API!**
 
 ## Features
 
 ### Core Features
+- **Multi-Coin Support**: Interactive dropdown to select from thousands of cryptocurrencies
+- **Coin Search**: Real-time search to find any cryptocurrency by name or symbol
 - **Interactive Candlestick Charts**: Fully interactive charts with zoom and pan capabilities
 - **Multiple Timeframes**: Support for 1m, 5m, 15m, 1h, 4h, and 1d intervals
-- **Real-time Data**: Live price updates via Binance WebSocket
+- **Real-time Data**: Live price updates via CoinGecko API (30-second polling)
 - **Volume Analysis**: Volume chart with color-coded bars and volume profile sidebar
 
 ### Technical Indicators
@@ -26,8 +28,9 @@ A professional-grade technical analysis charting application built with React an
 - **Frontend**: React 18 + TypeScript
 - **Build Tool**: Vite
 - **Charts**: Lightweight Charts 4.x (TradingView's open-source library)
-- **Data Source**: Binance API (REST + WebSocket)
+- **Data Source**: CoinGecko API (OHLC + Market Data)
 - **HTTP Client**: Axios
+- **API Key**: CG-JGAQBXqSNA35K12FastZFd4E
 
 ## Project Structure
 
@@ -35,10 +38,11 @@ A professional-grade technical analysis charting application built with React an
 frontend/
 ├── src/
 │   ├── components/
-│   │   ├── TradingChart.tsx    # Main chart component
+│   │   ├── TradingChart.tsx    # Main chart component with coin selector
 │   │   └── TradingChart.css    # Chart styling
 │   ├── services/
-│   │   └── binanceApi.ts       # Binance API integration
+│   │   ├── coinGeckoApi.ts     # CoinGecko API integration
+│   │   └── binanceApi.ts       # Legacy Binance API (unused)
 │   ├── utils/
 │   │   └── indicators.ts       # Technical indicator calculations
 │   ├── types/
@@ -72,6 +76,12 @@ frontend/
    Navigate to `http://localhost:5173`
 
 ## Usage
+
+### Selecting a Cryptocurrency
+1. Click on the coin selector dropdown (shows current coin)
+2. Browse top 50 coins by market cap OR search for any coin
+3. Click on a coin to select it
+4. Chart will automatically load the new coin's data
 
 ### Changing Timeframes
 Click on any timeframe button (1m, 5m, 15m, 1h, 4h, 1d) in the top control panel to switch chart intervals.
@@ -126,17 +136,35 @@ Automatically calculated between most recent swing high and swing low:
 
 ### Data Sources
 
-#### REST API
-Fetches historical candlestick data from Binance:
+#### CoinGecko API
+All data is fetched from CoinGecko API:
+
+**OHLC Candlestick Data:**
 ```
-GET https://api.binance.com/api/v3/klines
+GET https://api.coingecko.com/api/v3/coins/{id}/ohlc
 ```
 
-#### WebSocket
-Real-time price updates:
+**Real-time Price:**
 ```
-wss://stream.binance.com:9443/ws/{symbol}@kline_{interval}
+GET https://api.coingecko.com/api/v3/simple/price
 ```
+
+**Market Chart (Volume):**
+```
+GET https://api.coingecko.com/api/v3/coins/{id}/market_chart
+```
+
+**Coin Search:**
+```
+GET https://api.coingecko.com/api/v3/search
+```
+
+**Top Coins:**
+```
+GET https://api.coingecko.com/api/v3/coins/markets
+```
+
+All endpoints use the API key: `CG-JGAQBXqSNA35K12FastZFd4E`
 
 ## Build for Production
 
@@ -153,11 +181,13 @@ npm run preview
 
 ## Configuration
 
-### Changing Symbol
+### Changing Default Coin
 Edit `src/App.tsx`:
 ```typescript
-<TradingChart symbol="ETHUSDT" initialTimeframe="1h" />
+<TradingChart initialCoinId="ethereum" initialTimeframe="1h" />
 ```
+
+Available coin IDs can be found on [CoinGecko](https://www.coingecko.com/)
 
 ### Adjusting Indicator Parameters
 Edit `src/utils/indicators.ts` to modify:

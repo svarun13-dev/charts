@@ -258,24 +258,16 @@ export const TradingChart = ({ initialCoinId = 'bitcoin', initialTimeframe = '1h
     // Use a small timeout to ensure data is rendered before fitting
     setTimeout(() => {
       if (chartRef.current && candles.length > 0) {
-        // Show the most recent 50-100 bars by default for better visibility
-        const barsToShow = Math.min(candles.length, 80);
-        const lastIndex = candles.length - 1;
-        const firstIndex = Math.max(0, lastIndex - barsToShow + 1);
-
+        // Show all bars to display the complete data range
         chartRef.current.timeScale().setVisibleLogicalRange({
-          from: firstIndex,
-          to: lastIndex,
+          from: 0,
+          to: candles.length - 1,
         });
       }
       if (volumeChartRef.current && candles.length > 0) {
-        const barsToShow = Math.min(candles.length, 80);
-        const lastIndex = candles.length - 1;
-        const firstIndex = Math.max(0, lastIndex - barsToShow + 1);
-
         volumeChartRef.current.timeScale().setVisibleLogicalRange({
-          from: firstIndex,
-          to: lastIndex,
+          from: 0,
+          to: candles.length - 1,
         });
       }
     }, 100);

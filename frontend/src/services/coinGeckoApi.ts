@@ -5,14 +5,18 @@ const BASE_URL = 'https://api.coingecko.com/api/v3';
 const API_KEY = 'CG-JGAQBXqSNA35K12FastZFd4E';
 
 // Map timeframes to CoinGecko days parameter
+// Note: CoinGecko OHLC endpoint limitations:
+// - 1 day: 30-minute candles
+// - 2-90 days: 4-hour candles
+// - 90+ days: 4-day candles
 const timeframeToDays = (timeframe: Timeframe): number => {
   const mapping: Record<Timeframe, number> = {
-    '1m': 1,    // 1 day = 30min candles
-    '5m': 1,    // 1 day = 30min candles
-    '15m': 1,   // 1 day = 30min candles
-    '1h': 7,    // 7 days = 4h candles
-    '4h': 30,   // 30 days = 4h candles
-    '1d': 365,  // 365 days = daily candles
+    '1m': 1,    // 1 day = 30min candles (closest to 1m)
+    '5m': 1,    // 1 day = 30min candles (closest to 5m)
+    '15m': 1,   // 1 day = 30min candles (closest to 15m)
+    '1h': 1,    // 1 day = 30min candles (closest to 1h, will show ~48 candles)
+    '4h': 14,   // 14 days = 4h candles (~84 candles)
+    '1d': 90,   // 90 days = daily candles
   };
   return mapping[timeframe];
 };

@@ -258,28 +258,25 @@ export const TradingChart = ({ initialCoinId = 'bitcoin', initialTimeframe = '1h
     // Use a small timeout to ensure data is rendered before fitting
     setTimeout(() => {
       if (chartRef.current && candles.length > 0) {
-        // Set visible range to show all data
-        const from = candles[0].time;
-        const to = candles[candles.length - 1].time;
+        // Show the most recent 50-100 bars by default for better visibility
+        const barsToShow = Math.min(candles.length, 80);
+        const lastIndex = candles.length - 1;
+        const firstIndex = Math.max(0, lastIndex - barsToShow + 1);
 
-        chartRef.current.timeScale().setVisibleRange({
-          from: from as Time,
-          to: to as Time,
+        chartRef.current.timeScale().setVisibleLogicalRange({
+          from: firstIndex,
+          to: lastIndex,
         });
-
-        // Then fit content with some padding
-        chartRef.current.timeScale().fitContent();
       }
       if (volumeChartRef.current && candles.length > 0) {
-        const from = candles[0].time;
-        const to = candles[candles.length - 1].time;
+        const barsToShow = Math.min(candles.length, 80);
+        const lastIndex = candles.length - 1;
+        const firstIndex = Math.max(0, lastIndex - barsToShow + 1);
 
-        volumeChartRef.current.timeScale().setVisibleRange({
-          from: from as Time,
-          to: to as Time,
+        volumeChartRef.current.timeScale().setVisibleLogicalRange({
+          from: firstIndex,
+          to: lastIndex,
         });
-
-        volumeChartRef.current.timeScale().fitContent();
       }
     }, 100);
 

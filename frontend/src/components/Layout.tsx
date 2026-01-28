@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import clsx from 'clsx'
+import StarField from './animations/StarField'
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -24,14 +25,22 @@ export default function Layout() {
   const { system, setSystem } = useStore()
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex cosmic-bg relative">
+      {/* Animated Star Background */}
+      <StarField />
+
       {/* Sidebar */}
-      <aside className="w-64 bg-gray-900/50 border-r border-gray-800 flex flex-col">
+      <aside className="w-64 bg-gray-900/70 backdrop-blur-sm border-r border-gray-800 flex flex-col relative z-10">
         {/* Logo */}
         <div className="p-6 border-b border-gray-800">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cosmic-500 to-cosmic-700 flex items-center justify-center">
-              <Sparkles className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cosmic-500 to-cosmic-700 flex items-center justify-center relative overflow-hidden group">
+              <Sparkles className="w-6 h-6 text-white relative z-10 group-hover:scale-110 transition-transform" />
+              <div className="absolute inset-0 bg-gradient-to-br from-cosmic-400 to-cosmic-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute inset-0 spin-slow opacity-30">
+                <span className="absolute text-[8px] text-white/50" style={{ top: 2, left: '50%', transform: 'translateX(-50%)' }}>☉</span>
+                <span className="absolute text-[8px] text-white/50" style={{ bottom: 2, left: '50%', transform: 'translateX(-50%)' }}>☽</span>
+              </div>
             </div>
             <div>
               <h1 className="text-lg font-bold text-white">AstroTrader</h1>
@@ -104,7 +113,7 @@ export default function Layout() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-auto relative z-10">
         <Outlet />
       </main>
     </div>

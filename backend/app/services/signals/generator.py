@@ -13,7 +13,14 @@ from app.services.astrology.calculator import AstrologyCalculator
 from app.services.astrology.aspects import AspectCalculator
 from app.services.astrology.moon import MoonCalculator
 from app.services.signals.rules import SignalRules
-from app.core.constants import ASPECTS, DEFAULT_ASSETS
+from app.core.constants import ASPECTS, DEFAULT_ASSETS, PLANETS
+
+
+def format_planet_name(planet_key: str) -> str:
+    """Convert planet key to display name (e.g., 'north_node' -> 'North Node')"""
+    if planet_key in PLANETS:
+        return PLANETS[planet_key]["name"]
+    return planet_key.replace("_", " ").title()
 
 
 class SignalGenerator:
@@ -169,7 +176,7 @@ class SignalGenerator:
                 "strength": strength,
                 "markets": markets,
                 "assets": self._get_suggested_assets(markets),
-                "trigger": f"{aspect['planet1'].title()}-{aspect['planet2'].title()} {aspect['aspect_type']}",
+                "trigger": f"{format_planet_name(aspect['planet1'])}-{format_planet_name(aspect['planet2'])} {aspect['aspect_type']}",
                 "planetary_config": {
                     "aspect": aspect,
                     "retrogrades": [r["planet"] for r in retrogrades],
@@ -190,7 +197,7 @@ class SignalGenerator:
                     "strength": "moderate",
                     "markets": ["crypto", "stocks", "commodities"],
                     "assets": None,
-                    "trigger": f"{retro['planet'].title()} Retrograde",
+                    "trigger": f"{format_planet_name(retro['planet'])} Retrograde",
                     "planetary_config": {"retrograde": retro},
                     "description": self._generate_retrograde_description(retro),
                     "expires": retro.get("ends"),
@@ -236,8 +243,8 @@ class SignalGenerator:
     ) -> str:
         """Generate human-readable description for an aspect signal"""
         nature = aspect["nature"]
-        p1 = aspect["planet1"].title()
-        p2 = aspect["planet2"].title()
+        p1 = format_planet_name(aspect["planet1"])
+        p2 = format_planet_name(aspect["planet2"])
         aspect_name = aspect["aspect_type"].title()
 
         if nature == "harmonious":
@@ -249,7 +256,7 @@ class SignalGenerator:
 
     def _generate_retrograde_description(self, retro: Dict[str, Any]) -> str:
         """Generate description for retrograde signal"""
-        planet = retro["planet"].title()
+        planet = format_planet_name(retro["planet"])
 
         descriptions = {
             "Mercury": "Mercury Retrograde active - expect communication errors, tech glitches, and market confusion. Avoid major decisions.",
@@ -303,10 +310,10 @@ class SignalGenerator:
                 upcoming.append({
                     "date": future_date,
                     "event_type": "aspect",
-                    "trigger": f"{aspect['planet1'].title()}-{aspect['planet2'].title()} {aspect['aspect_type']}",
+                    "trigger": f"{format_planet_name(aspect['planet1'])}-{format_planet_name(aspect['planet2'])} {aspect['aspect_type']}",
                     "strength": self._get_signal_strength([aspect]),
                     "markets": markets,
-                    "description": f"Upcoming {aspect['aspect_type']} between {aspect['planet1']} and {aspect['planet2']}",
+                    "description": f"Upcoming {aspect['aspect_type']} between {format_planet_name(aspect['planet1'])} and {format_planet_name(aspect['planet2'])}",
                 })
 
         return upcoming

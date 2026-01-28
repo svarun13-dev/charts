@@ -98,7 +98,7 @@ export default function Dashboard() {
 
       {/* Retrograde Alerts */}
       {retrogrades.length > 0 && (
-        <div className="mb-6">
+        <div className="mb-6 fade-in">
           <RetrogradeAlerts retrogrades={retrogrades} />
         </div>
       )}
@@ -108,23 +108,31 @@ export default function Dashboard() {
         {/* Left Column */}
         <div className="lg:col-span-2 space-y-6">
           {/* Planetary Positions */}
-          <PlanetaryPositions
-            positions={planetPositions}
-            system={system}
-            isLoading={isLoading}
-          />
+          <div className="fade-in" style={{ animationDelay: '0.1s' }}>
+            <PlanetaryPositions
+              positions={planetPositions}
+              system={system}
+              isLoading={isLoading}
+            />
+          </div>
 
           {/* Active Signals */}
-          <ActiveSignals signals={activeSignals} isLoading={isLoading} />
+          <div className="fade-in" style={{ animationDelay: '0.2s' }}>
+            <ActiveSignals signals={activeSignals} isLoading={isLoading} />
+          </div>
         </div>
 
         {/* Right Column */}
         <div className="space-y-6">
           {/* Moon Phase */}
-          <MoonPhaseCard phase={moonPhase} isLoading={isLoading} />
+          <div className="fade-in" style={{ animationDelay: '0.15s' }}>
+            <MoonPhaseCard phase={moonPhase} isLoading={isLoading} />
+          </div>
 
           {/* Active Aspects */}
-          <AspectsList aspects={aspects} isLoading={isLoading} />
+          <div className="fade-in" style={{ animationDelay: '0.25s' }}>
+            <AspectsList aspects={aspects} isLoading={isLoading} />
+          </div>
         </div>
       </div>
     </div>

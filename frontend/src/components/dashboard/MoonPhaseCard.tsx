@@ -22,18 +22,18 @@ export default function MoonPhaseCard({ phase, isLoading }: Props) {
   if (!phase) return null
 
   return (
-    <div className="card">
+    <div className="card card-hover">
       <div className="card-header">
-        <span className="text-2xl">🌙</span>
+        <span className="text-2xl float">🌙</span>
         Moon Phase
       </div>
 
       <div className="text-center">
         {/* Moon Visual */}
-        <div className="relative w-24 h-24 mx-auto mb-4">
+        <div className="relative w-24 h-24 mx-auto mb-4 moon-glow">
           <div className="absolute inset-0 rounded-full bg-gradient-to-r from-gray-700 to-gray-800" />
           <div
-            className="absolute inset-0 rounded-full bg-gradient-to-r from-gray-200 to-gray-100"
+            className="absolute inset-0 rounded-full bg-gradient-to-r from-gray-200 to-gray-100 transition-all duration-1000"
             style={{
               clipPath: `inset(0 ${100 - phase.illumination}% 0 0)`,
             }}

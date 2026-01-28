@@ -37,9 +37,9 @@ export default function PlanetaryPositions({ positions, system, isLoading }: Pro
   }
 
   return (
-    <div className="card">
+    <div className="card card-hover">
       <div className="card-header">
-        <span className="text-2xl">🪐</span>
+        <span className="text-2xl spin-slow">🪐</span>
         Planetary Positions
       </div>
 
@@ -55,14 +55,15 @@ export default function PlanetaryPositions({ positions, system, isLoading }: Pro
             </tr>
           </thead>
           <tbody>
-            {positions.map((pos) => (
+            {positions.map((pos, index) => (
               <tr
                 key={pos.planet}
-                className="border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors"
+                className="border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors fade-in"
+                style={{ animationDelay: `${index * 0.05}s` }}
               >
                 <td className="py-3">
                   <div className="flex items-center gap-2">
-                    <span className={clsx('text-xl', planetColors[pos.planet])}>
+                    <span className={clsx('text-xl transition-transform hover:scale-125', planetColors[pos.planet])}>
                       {pos.symbol}
                     </span>
                     <span className="font-medium text-gray-200">
@@ -72,7 +73,7 @@ export default function PlanetaryPositions({ positions, system, isLoading }: Pro
                 </td>
                 <td className="py-3">
                   <div className="flex items-center gap-2">
-                    <span className="text-lg">{pos.sign_symbol}</span>
+                    <span className="text-lg zodiac-symbol">{pos.sign_symbol}</span>
                     <span className="text-gray-300">{pos.sign}</span>
                   </div>
                 </td>

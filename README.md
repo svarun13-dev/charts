@@ -1,92 +1,115 @@
-# 🧠 Generative AI Project Template
+# AstroTrader - Zodiac & Planetary Position Trading Platform
 
-A production-ready template to help you kickstart and organize your Generative AI projects with clarity and scalability in mind.  
-Designed to reduce chaos in early development and support long-term maintainability with proven structure and practices.
+A comprehensive trading signal platform that combines Western and Vedic astrology with market analysis for crypto, stocks, and commodities.
 
-[![Follow @HeyNina101](https://img.shields.io/badge/Follow-%40HeyNina101-1da1f2?style=flat&logo=github)](https://github.com/HeyNina101)
+## Features
 
-[![Star this repo](https://img.shields.io/badge/⭐%20Star-generative__ai__project-ffcc00?style=flat&logo=github)](https://github.com/HeyNina101/generative_ai_project)
+- **Dual Astrology Systems**: Switch between Western (Tropical) and Vedic (Sidereal) calculations
+- **Real-time Planetary Positions**: Track all planets, aspects, and transits
+- **Multi-Market Support**: Crypto, Stocks, and Commodities
+- **Signal Generation**: Automated trading signals based on planetary configurations
+- **Interactive Dashboard**: Visualize planetary positions alongside price charts
+- **Retrograde Alerts**: Mercury, Venus, Mars retrograde warnings
+- **Lunar Cycle Tracking**: New moon/full moon trading indicators
+- **Aspect Analysis**: Conjunctions, squares, trines, oppositions, and sextiles
 
+## Tech Stack
 
----
+### Backend
+- Python 3.11+
+- FastAPI
+- Swiss Ephemeris (via pyswisseph)
+- SQLAlchemy + SQLite/PostgreSQL
+- Pydantic for validation
 
-## 📋 Project Overview
+### Frontend
+- React 18 + TypeScript
+- Vite
+- TailwindCSS
+- Recharts for visualizations
+- Zustand for state management
 
-A production-ready template for building scalable Generative AI apps — structured, maintainable, and built on real-world best practices.
-
----
-
-## 🔧 Key Components
-
-```
-
-📁 config/ → YAML config for models, prompts, logging
-📁 data/ → Prompts, embeddings, and other dynamic content
-📁 examples/ → Minimal scripts to test key features
-📁 notebooks/ → Quick experiments and prototyping
-📁 tests/ → Unit, integration, and end-to-end tests
-
-📁 src/ → The core engine — all logic lives here:
-├── agents/ → Agent classes: planner, executor, base agent
-├── memory/ → Short-term and long-term memory modules
-├── pipelines/ → Chat flows, doc processing, and task routing
-├── retrieval/ → Vector search and document lookup
-├── skills/ → Extra abilities: web search, code execution
-├── vision_audio/ → Multimodal processing: image and audio
-├── prompt_engineering/→ Prompt chaining, templates, few-shot logic
-├── llm/ → OpenAI, Anthropic, and custom LLM routing
-├── fallback/ → Recovery logic when LLMs fail
-├── guardrails/ → PII filters, output validation, safety checks
-├── handlers/ → Input/output processing and error management
-└── utils/ → Logging, caching, rate limiting, token counting
+## Project Structure
 
 ```
----
+├── backend/
+│   ├── app/
+│   │   ├── api/routes/       # API endpoints
+│   │   ├── core/             # Config, constants
+│   │   ├── services/
+│   │   │   ├── astrology/    # Planetary calculations
+│   │   │   ├── market/       # Market data fetching
+│   │   │   └── signals/      # Signal generation
+│   │   ├── models/           # Database models
+│   │   └── utils/            # Helpers
+│   └── tests/
+├── frontend/
+│   ├── src/
+│   │   ├── components/       # React components
+│   │   ├── hooks/            # Custom hooks
+│   │   ├── services/         # API clients
+│   │   ├── store/            # Zustand stores
+│   │   └── types/            # TypeScript types
+│   └── public/
+└── docker-compose.yml
+```
 
-## ⚡ Best Practices
+## Quick Start
 
-- Track prompt versions and results  
-- Separate configs using YAML files  
-- Structure code by clear module boundaries  
-- Cache responses to reduce latency and cost  
-- Handle errors with custom exceptions  
-- Use notebooks for rapid testing and iteration  
-- Monitor API usage and set rate limits  
-- Keep code and docs in sync  
+### Backend
 
----
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
 
-## 🧭 Getting Started
+### Frontend
 
-1. Clone the repo  
-2. Install via `requirements.txt`  
-3. Set up model configs  
-4. Check sample code  
-5. Begin in notebooks  
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
----
+## API Endpoints
 
-## 💡 Development Tips
+### Astrology
+- `GET /api/v1/planets/positions` - Current planetary positions
+- `GET /api/v1/planets/aspects` - Active aspects
+- `GET /api/v1/planets/retrogrades` - Retrograde status
+- `GET /api/v1/moon/phase` - Current moon phase
 
-- Use modular structure  
-- Test components early  
-- Track with version control  
-- Keep datasets fresh  
-- Monitor API usage  
+### Signals
+- `GET /api/v1/signals/active` - Active trading signals
+- `GET /api/v1/signals/history` - Historical signals
+- `POST /api/v1/signals/configure` - Configure signal rules
 
----
+### Market
+- `GET /api/v1/market/{symbol}/price` - Current price
+- `GET /api/v1/market/{symbol}/history` - Historical data
 
-## 📁 Core Files
+## Astrological Concepts
 
-- `requirements.txt` – Package dependencies  
-- `README.md` – Project overview and usage  
-- `Dockerfile` – Container build instructions  
+### Western (Tropical) Astrology
+- Based on the seasons and the vernal equinox
+- Uses the tropical zodiac
+- Popular in Western countries
 
----
+### Vedic (Sidereal) Astrology
+- Based on fixed star positions
+- Uses the sidereal zodiac (~23° offset from tropical)
+- Traditional Indian system (Jyotish)
 
-## 📄 License
+### Key Aspects Tracked
+- **Conjunction (0°)**: Planets aligned - intensification
+- **Sextile (60°)**: Harmonious opportunity
+- **Square (90°)**: Tension and challenge
+- **Trine (120°)**: Flowing harmony
+- **Opposition (180°)**: Polarity and awareness
 
-This project is licensed under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0).  
-You are free to use, modify, and distribute with minimal restriction.
+## License
 
----
+MIT License

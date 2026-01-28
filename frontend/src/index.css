@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-950 text-gray-100 antialiased;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-6;
+  }
+
+  .card-header {
+    @apply text-lg font-semibold text-gray-100 mb-4 flex items-center gap-2;
+  }
+
+  .btn-primary {
+    @apply px-4 py-2 bg-cosmic-600 hover:bg-cosmic-700 text-white rounded-lg transition-colors font-medium;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded-lg transition-colors font-medium;
+  }
+
+  .badge {
+    @apply px-2 py-1 text-xs font-medium rounded-full;
+  }
+
+  .badge-bullish {
+    @apply bg-green-500/20 text-green-400;
+  }
+
+  .badge-bearish {
+    @apply bg-red-500/20 text-red-400;
+  }
+
+  .badge-neutral {
+    @apply bg-gray-500/20 text-gray-400;
+  }
+
+  .badge-volatile {
+    @apply bg-yellow-500/20 text-yellow-400;
+  }
+
+  .signal-strength-weak {
+    @apply text-gray-400;
+  }
+
+  .signal-strength-moderate {
+    @apply text-yellow-400;
+  }
+
+  .signal-strength-strong {
+    @apply text-orange-400;
+  }
+
+  .signal-strength-very_strong {
+    @apply text-red-400;
+  }
+}
+
+/* Zodiac wheel animation */
+.zodiac-wheel {
+  animation: rotate 120s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Planet glow effects */
+.planet-sun { text-shadow: 0 0 10px #fbbf24; }
+.planet-moon { text-shadow: 0 0 10px #e5e7eb; }
+.planet-mercury { text-shadow: 0 0 10px #a78bfa; }
+.planet-venus { text-shadow: 0 0 10px #f472b6; }
+.planet-mars { text-shadow: 0 0 10px #ef4444; }
+.planet-jupiter { text-shadow: 0 0 10px #f97316; }
+.planet-saturn { text-shadow: 0 0 10px #eab308; }
+.planet-uranus { text-shadow: 0 0 10px #06b6d4; }
+.planet-neptune { text-shadow: 0 0 10px #3b82f6; }
+.planet-pluto { text-shadow: 0 0 10px #8b5cf6; }
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-900;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-700 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-600;
+}

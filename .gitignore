@@ -1,19 +1,68 @@
-# Python cache and virtual environments
+# Python
 __pycache__/
-*.pyc
-.venv/
+*.py[cod]
+*$py.class
+*.so
+.Python
 venv/
+ENV/
+.venv/
+env/
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
 
-# Data folders (cache/outputs)
-data/cache/
-data/outputs/
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 
-# API keys and secrets
+# Environment
 .env
-*.key
+.env.local
+.env.*.local
 
-# System files (Windows/macOS)
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build
+dist/
+build/
+*.local
+
+# OS
+.DS_Store
 Thumbs.db
-.DS_Store 
 
-src/**/.gitkeep
+# Data
+data/
+*.csv
+!package.json
+!tsconfig.json
+!tsconfig.node.json
+
+# Ephemeris data
+*.bsp
+*.eph

@@ -30,8 +30,8 @@ PLANETS: Dict[str, Dict] = {
     "uranus": {"id": 7, "symbol": "♅", "name": "Uranus", "vedic_name": "Uranus"},
     "neptune": {"id": 8, "symbol": "♆", "name": "Neptune", "vedic_name": "Neptune"},
     "pluto": {"id": 9, "symbol": "♇", "name": "Pluto", "vedic_name": "Pluto"},
-    "north_node": {"id": 10, "symbol": "☊", "name": "North Node", "vedic_name": "Rahu"},
-    "south_node": {"id": 11, "symbol": "☋", "name": "South Node", "vedic_name": "Ketu"},
+    "rahu": {"id": 10, "symbol": "☊", "name": "North Node", "vedic_name": "Rahu"},
+    "ketu": {"id": 11, "symbol": "☋", "name": "South Node", "vedic_name": "Ketu"},
 }
 
 # Western Tropical Zodiac Signs

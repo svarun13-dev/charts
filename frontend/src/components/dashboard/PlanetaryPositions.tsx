@@ -18,8 +18,8 @@ const planetColors: Record<string, string> = {
   uranus: 'text-cyan-400 planet-uranus',
   neptune: 'text-blue-400 planet-neptune',
   pluto: 'text-purple-500 planet-pluto',
-  north_node: 'text-gray-400',
-  south_node: 'text-gray-500',
+  rahu: 'text-gray-400',
+  ketu: 'text-gray-500',
 }
 
 export default function PlanetaryPositions({ positions, system, isLoading }: Props) {

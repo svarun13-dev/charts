@@ -103,12 +103,12 @@ class SignalRules:
                 "markets": ["stocks", "commodities"],
                 "strength_modifier": 1.1,
             },
-            "north_node": {
+            "rahu": {
                 "influence": "destiny, growth direction, collective purpose",
                 "markets": ["crypto", "stocks"],
                 "strength_modifier": 0.7,
             },
-            "south_node": {
+            "ketu": {
                 "influence": "release, past patterns, letting go",
                 "markets": ["crypto", "stocks"],
                 "strength_modifier": 0.7,

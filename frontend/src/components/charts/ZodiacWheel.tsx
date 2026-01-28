@@ -31,8 +31,8 @@ const planetColors: Record<string, string> = {
   uranus: '#06b6d4',
   neptune: '#3b82f6',
   pluto: '#8b5cf6',
-  north_node: '#9ca3af',
-  south_node: '#6b7280',
+  rahu: '#9ca3af',
+  ketu: '#6b7280',
 }
 
 export default function ZodiacWheel({ positions }: Props) {

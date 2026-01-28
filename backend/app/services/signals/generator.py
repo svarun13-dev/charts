@@ -17,7 +17,7 @@ from app.core.constants import ASPECTS, DEFAULT_ASSETS, PLANETS
 
 
 def format_planet_name(planet_key: str) -> str:
-    """Convert planet key to display name (e.g., 'north_node' -> 'North Node')"""
+    """Convert planet key to display name (e.g., 'rahu' -> 'North Node')"""
     if planet_key in PLANETS:
         return PLANETS[planet_key]["name"]
     return planet_key.replace("_", " ").title()

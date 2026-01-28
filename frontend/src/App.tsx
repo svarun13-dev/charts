@@ -4,6 +4,7 @@ import Dashboard from './components/dashboard/Dashboard'
 import SignalsPage from './components/signals/SignalsPage'
 import ChartsPage from './components/charts/ChartsPage'
 import SettingsPage from './components/settings/SettingsPage'
+import GlossaryPage from './components/GlossaryPage'
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
           <Route index element={<Dashboard />} />
           <Route path="signals" element={<SignalsPage />} />
           <Route path="charts" element={<ChartsPage />} />
+          <Route path="guide" element={<GlossaryPage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>
       </Routes>

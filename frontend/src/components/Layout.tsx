@@ -7,6 +7,7 @@ import {
   Moon,
   Sun,
   Sparkles,
+  BookOpen,
 } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import clsx from 'clsx'
@@ -15,6 +16,7 @@ const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/signals', icon: TrendingUp, label: 'Signals' },
   { to: '/charts', icon: PieChart, label: 'Charts' },
+  { to: '/guide', icon: BookOpen, label: 'Guide' },
   { to: '/settings', icon: Settings, label: 'Settings' },
 ]
 

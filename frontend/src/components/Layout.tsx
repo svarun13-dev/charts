@@ -8,6 +8,7 @@ import {
   Sun,
   Sparkles,
   BookOpen,
+  Compass,
 } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import clsx from 'clsx'
@@ -15,6 +16,7 @@ import StarField from './animations/StarField'
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/insights', icon: Compass, label: 'Insights' },
   { to: '/signals', icon: TrendingUp, label: 'Signals' },
   { to: '/charts', icon: PieChart, label: 'Charts' },
   { to: '/guide', icon: BookOpen, label: 'Guide' },

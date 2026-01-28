@@ -5,6 +5,7 @@ import SignalsPage from './components/signals/SignalsPage'
 import ChartsPage from './components/charts/ChartsPage'
 import SettingsPage from './components/settings/SettingsPage'
 import GlossaryPage from './components/GlossaryPage'
+import InsightsPage from './components/insights/InsightsPage'
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
+          <Route path="insights" element={<InsightsPage />} />
           <Route path="signals" element={<SignalsPage />} />
           <Route path="charts" element={<ChartsPage />} />
           <Route path="guide" element={<GlossaryPage />} />

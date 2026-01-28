@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 from app.core.config import settings
-from app.api.routes import planets, signals, market, moon, system
+from app.api.routes import planets, signals, market, moon, system, insights
 
 
 @asynccontextmanager
@@ -66,6 +66,12 @@ app.include_router(
     system.router,
     prefix=f"{settings.api_v1_prefix}/system",
     tags=["System"],
+)
+
+app.include_router(
+    insights.router,
+    prefix=f"{settings.api_v1_prefix}/insights",
+    tags=["Insights"],
 )
 
 

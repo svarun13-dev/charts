@@ -8,19 +8,42 @@ import SearchBar from './SearchBar'
 
 const POLL_INTERVAL_MS = 30_000
 
+const COL_STYLE: React.CSSProperties = {
+  fontSize: 10,
+  fontWeight: 500,
+  color: '#333',
+  letterSpacing: '0.07em',
+  textTransform: 'uppercase',
+  paddingBottom: 10,
+}
+
 function LoadingSkeleton() {
   return (
-    <div className="animate-pulse space-y-0">
+    <tbody>
       {Array.from({ length: 8 }).map((_, i) => (
-        <div key={i} className="border-t border-[#2a2a3d] px-4 py-3.5 flex items-center gap-4">
-          <div className="h-4 w-12 bg-[#1a1a26] rounded" />
-          <div className="h-3 w-32 bg-[#1a1a26] rounded hidden sm:block" />
-          <div className="h-5 w-16 bg-[#1a1a26] rounded hidden md:block" />
-          <div className="h-4 w-20 bg-[#1a1a26] rounded ml-auto" />
-          <div className="h-4 w-12 bg-[#1a1a26] rounded" />
-        </div>
+        <tr key={i} style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+          <td className="py-3.5 pl-5 pr-4">
+            <div className="h-3.5 w-10 rounded animate-pulse" style={{ background: '#111' }} />
+          </td>
+          <td className="py-3.5 px-4 hidden sm:table-cell">
+            <div className="h-3 w-36 rounded animate-pulse" style={{ background: '#111' }} />
+          </td>
+          <td className="py-3.5 px-4 hidden md:table-cell">
+            <div className="h-5 w-14 rounded animate-pulse" style={{ background: '#111' }} />
+          </td>
+          <td className="py-3.5 px-4">
+            <div className="h-3.5 w-20 rounded animate-pulse" style={{ background: '#111' }} />
+          </td>
+          <td className="py-3.5 px-4">
+            <div className="h-3 w-10 rounded animate-pulse" style={{ background: '#111' }} />
+          </td>
+          <td className="py-3.5 px-4 hidden lg:table-cell">
+            <div className="h-3 w-12 rounded animate-pulse" style={{ background: '#111' }} />
+          </td>
+          <td className="py-3.5 pl-4 pr-5 hidden md:table-cell" />
+        </tr>
       ))}
-    </div>
+    </tbody>
   )
 }
 
@@ -53,7 +76,6 @@ export default function StockTable() {
     return () => clearInterval(id)
   }, [fetchQuotes])
 
-  // Re-render "X seconds ago" ticker every 10s
   const [, setTick] = useState(0)
   useEffect(() => {
     const id = setInterval(() => setTick((t) => t + 1), 10_000)
@@ -69,16 +91,18 @@ export default function StockTable() {
   return (
     <div>
       {/* Toolbar */}
-      <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
+      <div
+        className="flex items-center justify-between mb-0 pb-4"
+        style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+      >
         <SearchBar value={search} onChange={setSearch} count={filteredStocks.length} />
-        <div className="flex items-center gap-2 text-xs text-[#6b6b8a]">
-          {lastFetch && (
-            <span>Updated {timeAgo(lastFetch.toISOString())}</span>
-          )}
+        <div className="flex items-center gap-3" style={{ color: '#333', fontSize: 12 }}>
+          {lastFetch && <span>{timeAgo(lastFetch.toISOString())}</span>}
           <button
             onClick={fetchQuotes}
-            className="ml-1 p-1 rounded hover:bg-[#1a1a26] transition-colors"
-            title="Refresh now"
+            title="Refresh"
+            className="hover:text-white transition-colors"
+            style={{ color: '#333', lineHeight: 1 }}
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -88,71 +112,62 @@ export default function StockTable() {
       </div>
 
       {/* Table */}
-      <div className="rounded-xl border border-[#2a2a3d] bg-[#12121a] overflow-hidden">
-        {/* Column headers */}
-        <div className="hidden sm:block border-b border-[#2a2a3d]">
-          <table className="w-full">
-            <thead>
-              <tr className="text-[10px] uppercase tracking-wider text-[#6b6b8a]">
-                <th className="py-3 pl-4 pr-3 text-left font-medium w-[110px]">Ticker</th>
-                <th className="py-3 px-3 text-left font-medium hidden sm:table-cell">Name</th>
-                <th className="py-3 px-3 text-left font-medium hidden md:table-cell w-[110px]">Best venue</th>
-                <th className="py-3 px-3 text-left font-medium w-[110px]">Price</th>
-                <th className="py-3 px-3 text-left font-medium w-[90px]">Spread</th>
-                <th className="py-3 px-3 text-left font-medium hidden lg:table-cell w-[100px]">Liquidity</th>
-                <th className="py-3 pl-3 pr-4 text-left font-medium hidden md:table-cell">Also on</th>
-              </tr>
-            </thead>
-          </table>
-        </div>
+      <table className="w-full">
+        <thead>
+          <tr>
+            <th style={{ ...COL_STYLE, paddingLeft: 20, paddingRight: 16, width: 120, textAlign: 'left', paddingTop: 14 }}>Ticker</th>
+            <th style={{ ...COL_STYLE, padding: '14px 16px 10px', textAlign: 'left' }} className="hidden sm:table-cell">Name</th>
+            <th style={{ ...COL_STYLE, padding: '14px 16px 10px', textAlign: 'left', width: 110 }} className="hidden md:table-cell">Best venue</th>
+            <th style={{ ...COL_STYLE, padding: '14px 16px 10px', textAlign: 'left', width: 110 }}>Price</th>
+            <th style={{ ...COL_STYLE, padding: '14px 16px 10px', textAlign: 'left', width: 80 }}>Spread</th>
+            <th style={{ ...COL_STYLE, padding: '14px 16px 10px', textAlign: 'left', width: 90 }} className="hidden lg:table-cell">Liquidity</th>
+            <th style={{ ...COL_STYLE, padding: '14px 20px 10px', textAlign: 'left' }} className="hidden md:table-cell">Also on</th>
+          </tr>
+        </thead>
 
         {loading && <LoadingSkeleton />}
 
-        {error && (
-          <div className="py-16 text-center text-sm text-[#6b6b8a]">
-            <p className="text-red-400 mb-2">Failed to load quotes</p>
-            <p>{error}</p>
-            <button
-              onClick={fetchQuotes}
-              className="mt-3 text-blue-400 hover:text-blue-300 underline underline-offset-2"
-            >
-              Try again
-            </button>
-          </div>
-        )}
-
         {!loading && !error && (
-          <>
+          <tbody>
             {filteredStocks.length === 0 ? (
-              <div className="py-16 text-center text-sm text-[#6b6b8a]">
-                {search ? `No stocks matching "${search}"` : 'No quotes available yet. Workers may still be starting up.'}
-              </div>
+              <tr>
+                <td colSpan={7} className="py-20 text-center" style={{ color: '#333', fontSize: 13 }}>
+                  {search ? `No results for "${search}"` : 'No quotes available yet.'}
+                </td>
+              </tr>
             ) : (
-              <table className="w-full">
-                <tbody>
-                  {filteredStocks.map((stock) => (
-                    <StockRow
-                      key={stock.ticker}
-                      stock={stock}
-                      isExpanded={expandedTicker === stock.ticker}
-                      onToggle={() =>
-                        setExpandedTicker(
-                          expandedTicker === stock.ticker ? null : stock.ticker
-                        )
-                      }
-                    />
-                  ))}
-                </tbody>
-              </table>
+              filteredStocks.map((stock) => (
+                <StockRow
+                  key={stock.ticker}
+                  stock={stock}
+                  isExpanded={expandedTicker === stock.ticker}
+                  onToggle={() =>
+                    setExpandedTicker(expandedTicker === stock.ticker ? null : stock.ticker)
+                  }
+                />
+              ))
             )}
-          </>
+          </tbody>
         )}
-      </div>
+      </table>
 
-      {/* Footer note */}
+      {error && (
+        <div className="py-20 text-center" style={{ color: '#444', fontSize: 13 }}>
+          <p style={{ color: '#666' }}>{error}</p>
+          <button
+            onClick={fetchQuotes}
+            className="mt-3 hover:text-white transition-colors underline underline-offset-2"
+            style={{ color: '#444' }}
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
+      {/* Footer */}
       {!loading && !error && data && (
-        <p className="mt-4 text-xs text-[#6b6b8a]">
-          {data.stocks.length} tokenized {data.stocks.length === 1 ? 'stock' : 'stocks'} tracked &middot; Spreads sourced from on-chain pools &middot; Not financial advice
+        <p className="mt-8 text-xs" style={{ color: '#2a2a2a' }}>
+          {data.stocks.length} assets · Spreads from on-chain pools · Not financial advice
         </p>
       )}
     </div>

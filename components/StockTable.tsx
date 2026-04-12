@@ -11,7 +11,7 @@ const POLL_INTERVAL_MS = 30_000
 const COL_STYLE: React.CSSProperties = {
   fontSize: 10,
   fontWeight: 500,
-  color: '#333',
+  color: '#555',
   letterSpacing: '0.07em',
   textTransform: 'uppercase',
   paddingBottom: 10,
@@ -96,13 +96,13 @@ export default function StockTable() {
         style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}
       >
         <SearchBar value={search} onChange={setSearch} count={filteredStocks.length} />
-        <div className="flex items-center gap-3" style={{ color: '#333', fontSize: 12 }}>
+        <div className="flex items-center gap-3" style={{ color: '#555', fontSize: 12 }}>
           {lastFetch && <span>{timeAgo(lastFetch.toISOString())}</span>}
           <button
             onClick={fetchQuotes}
             title="Refresh"
             className="hover:text-white transition-colors"
-            style={{ color: '#333', lineHeight: 1 }}
+            style={{ color: '#555', lineHeight: 1 }}
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -166,7 +166,7 @@ export default function StockTable() {
 
       {/* Footer */}
       {!loading && !error && data && (
-        <p className="mt-8 text-xs" style={{ color: '#2a2a2a' }}>
+        <p className="mt-8 text-xs" style={{ color: '#555' }}>
           {data.stocks.length} assets · Spreads from on-chain pools · Not financial advice
         </p>
       )}

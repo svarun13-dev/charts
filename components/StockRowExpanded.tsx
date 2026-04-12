@@ -63,22 +63,22 @@ function QuoteRow({ quote, isBest }: { quote: Quote; isBest: boolean }) {
       </td>
 
       {/* Price */}
-      <td className="py-3 px-4 font-mono text-sm tabular-nums" style={{ color: '#e5e5e5' }}>
+      <td className="py-3 px-4 font-mono text-sm tabular-nums font-medium" style={{ color: '#f0f0f0' }}>
         {formatPrice(quote.mid)}
       </td>
 
       {/* Spread */}
-      <td className={`py-3 px-4 font-mono text-xs tabular-nums font-medium ${spreadColorClass(quote.spreadPct)}`}>
+      <td className={`py-3 px-4 font-mono text-xs tabular-nums font-semibold ${spreadColorClass(quote.spreadPct)}`}>
         {formatSpread(quote.spreadPct)}
       </td>
 
       {/* Liquidity */}
-      <td className="py-3 px-4 text-xs tabular-nums" style={{ color: '#666' }}>
+      <td className="py-3 px-4 text-xs tabular-nums" style={{ color: '#999' }}>
         {formatLiquidity(quote.liquidityUsd)}
       </td>
 
       {/* Min buy */}
-      <td className="py-3 px-4 text-xs" style={{ color: '#555' }}>
+      <td className="py-3 px-4 text-xs" style={{ color: '#999' }}>
         ${quote.minBuyUsd === 1 ? '1' : quote.minBuyUsd.toFixed(0)}
       </td>
 
@@ -90,7 +90,7 @@ function QuoteRow({ quote, isBest }: { quote: Quote; isBest: boolean }) {
           rel="noopener noreferrer"
           onClick={(e) => e.stopPropagation()}
           className="text-xs font-medium transition-colors hover:text-white"
-          style={{ color: '#555' }}
+          style={{ color: '#888' }}
         >
           Buy ↗
         </a>
@@ -107,12 +107,12 @@ export default function StockRowExpanded({ stock }: StockRowExpandedProps) {
           <table className="w-full">
             <thead>
               <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                <th style={{ fontSize: 10, color: '#333', fontWeight: 500, letterSpacing: '0.07em', textTransform: 'uppercase', textAlign: 'left', padding: '10px 16px 10px 48px' }}>Venue</th>
-                <th style={{ fontSize: 10, color: '#333', fontWeight: 500, letterSpacing: '0.07em', textTransform: 'uppercase', textAlign: 'left', padding: '10px 16px' }}>Chain</th>
-                <th style={{ fontSize: 10, color: '#333', fontWeight: 500, letterSpacing: '0.07em', textTransform: 'uppercase', textAlign: 'left', padding: '10px 16px' }}>Price</th>
-                <th style={{ fontSize: 10, color: '#333', fontWeight: 500, letterSpacing: '0.07em', textTransform: 'uppercase', textAlign: 'left', padding: '10px 16px' }}>Spread</th>
-                <th style={{ fontSize: 10, color: '#333', fontWeight: 500, letterSpacing: '0.07em', textTransform: 'uppercase', textAlign: 'left', padding: '10px 16px' }}>Liquidity</th>
-                <th style={{ fontSize: 10, color: '#333', fontWeight: 500, letterSpacing: '0.07em', textTransform: 'uppercase', textAlign: 'left', padding: '10px 16px' }}>Min buy</th>
+                <th style={{ fontSize: 10, color: '#555', fontWeight: 500, letterSpacing: '0.07em', textTransform: 'uppercase', textAlign: 'left', padding: '10px 16px 10px 48px' }}>Venue</th>
+                <th style={{ fontSize: 10, color: '#555', fontWeight: 500, letterSpacing: '0.07em', textTransform: 'uppercase', textAlign: 'left', padding: '10px 16px' }}>Chain</th>
+                <th style={{ fontSize: 10, color: '#555', fontWeight: 500, letterSpacing: '0.07em', textTransform: 'uppercase', textAlign: 'left', padding: '10px 16px' }}>Price</th>
+                <th style={{ fontSize: 10, color: '#555', fontWeight: 500, letterSpacing: '0.07em', textTransform: 'uppercase', textAlign: 'left', padding: '10px 16px' }}>Spread</th>
+                <th style={{ fontSize: 10, color: '#555', fontWeight: 500, letterSpacing: '0.07em', textTransform: 'uppercase', textAlign: 'left', padding: '10px 16px' }}>Liquidity</th>
+                <th style={{ fontSize: 10, color: '#555', fontWeight: 500, letterSpacing: '0.07em', textTransform: 'uppercase', textAlign: 'left', padding: '10px 16px' }}>Min buy</th>
                 <th style={{ padding: '10px 32px 10px 16px' }} />
               </tr>
             </thead>

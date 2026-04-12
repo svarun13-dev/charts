@@ -24,23 +24,23 @@ export default function StockRow({ stock, isExpanded, onToggle }: StockRowProps)
       <tr
         onClick={onToggle}
         style={{
-          borderTop: '1px solid rgba(255,255,255,0.05)',
+          borderTop: '1px solid rgba(255,255,255,0.06)',
           cursor: 'pointer',
           opacity: bestQuote.stale ? 0.5 : 1,
-          background: isExpanded ? 'rgba(255,255,255,0.02)' : 'transparent',
+          background: isExpanded ? 'rgba(255,255,255,0.03)' : 'transparent',
           transition: 'background 0.1s',
         }}
-        className="group hover:bg-white/[0.02]"
+        className="group hover:bg-white/[0.03]"
       >
         {/* Logo + Ticker */}
-        <td className="py-2.5 pl-5 pr-4 whitespace-nowrap">
+        <td className="py-3 pl-5 pr-4 whitespace-nowrap">
           <div className="flex items-center gap-3">
             <svg
               className="flex-shrink-0 transition-transform"
               style={{
                 width: 10,
                 height: 10,
-                color: '#333',
+                color: '#555',
                 transform: isExpanded ? 'rotate(90deg)' : 'none',
               }}
               fill="none"
@@ -52,11 +52,11 @@ export default function StockRow({ stock, isExpanded, onToggle }: StockRowProps)
             </svg>
             <StockLogo ticker={stock.ticker} size={28} />
             <div className="flex flex-col gap-0.5">
-              <span className="font-medium text-white text-sm tracking-tight leading-none">
+              <span style={{ fontSize: 13, fontWeight: 600, color: '#fff', letterSpacing: '-0.01em', lineHeight: 1 }}>
                 {stock.ticker}
               </span>
               {stock.assetType === 'etf' && (
-                <span style={{ fontSize: 9, color: '#444', fontWeight: 500, letterSpacing: '0.06em', lineHeight: 1 }}>
+                <span style={{ fontSize: 9, color: '#666', fontWeight: 500, letterSpacing: '0.06em', lineHeight: 1.4 }}>
                   ETF
                 </span>
               )}
@@ -65,32 +65,32 @@ export default function StockRow({ stock, isExpanded, onToggle }: StockRowProps)
         </td>
 
         {/* Name */}
-        <td className="py-2.5 px-4 text-sm hidden sm:table-cell" style={{ color: '#555' }}>
+        <td className="py-3 px-4 hidden sm:table-cell" style={{ fontSize: 13, color: '#999' }}>
           {stock.name}
         </td>
 
         {/* Best venue */}
-        <td className="py-2.5 px-4 hidden md:table-cell">
+        <td className="py-3 px-4 hidden md:table-cell">
           <VenuePill platform={bestQuote.platform as Platform} />
         </td>
 
         {/* Price */}
-        <td className="py-2.5 px-4 font-mono text-sm tabular-nums" style={{ color: '#ddd' }}>
+        <td className="py-3 px-4 font-mono tabular-nums" style={{ fontSize: 13, color: '#f0f0f0', fontWeight: 500 }}>
           {formatPrice(bestQuote.mid)}
         </td>
 
         {/* Spread */}
-        <td className={`py-2.5 px-4 font-mono text-xs tabular-nums font-medium ${spreadColorClass(bestQuote.spreadPct)}`}>
+        <td className={`py-3 px-4 font-mono tabular-nums font-semibold text-xs ${spreadColorClass(bestQuote.spreadPct)}`}>
           {formatSpread(bestQuote.spreadPct)}
         </td>
 
         {/* Liquidity */}
-        <td className="py-2.5 px-4 text-xs hidden lg:table-cell" style={{ color: '#555' }}>
+        <td className="py-3 px-4 hidden lg:table-cell tabular-nums" style={{ fontSize: 13, color: '#888' }}>
           {formatLiquidity(bestQuote.liquidityUsd)}
         </td>
 
         {/* Other venues */}
-        <td className="py-2.5 pl-4 pr-5 hidden md:table-cell">
+        <td className="py-3 pl-4 pr-5 hidden md:table-cell">
           <div className="flex items-center gap-1.5">
             {otherPlatforms.map((p) => (
               <VenuePill key={p} platform={p as Platform} size="xs" muted />

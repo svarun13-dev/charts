@@ -1,5 +1,6 @@
 import type { Quote } from '@/types'
-import { STALE_THRESHOLD_SECONDS } from './redis'
+
+const STALE_THRESHOLD_SECONDS = 90
 
 /**
  * Picks the best venue: lowest spreadPct, with liquidityUsd as tiebreaker.

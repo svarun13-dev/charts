@@ -99,3 +99,21 @@ export function formatSlippage(slippagePct: number): string {
 export function formatApy(apy: number): string {
   return `${apy.toFixed(2)}%`
 }
+
+/**
+ * Returns the % deviation of an on-chain price vs a reference (off-chain) price.
+ * Negative = discount (on-chain cheaper than market) — good for buyers.
+ * Positive = premium (on-chain more expensive than market).
+ */
+export function priceBasis(onChain: number, ref: number): number {
+  if (ref <= 0) return 0
+  return ((onChain - ref) / ref) * 100
+}
+
+/**
+ * Formats a basis value for display. e.g. -0.038 → "−0.04%" (discount)
+ */
+export function formatBasis(basisPct: number): string {
+  const sign = basisPct >= 0 ? '+' : '−'
+  return `${sign}${Math.abs(basisPct).toFixed(2)}%`
+}

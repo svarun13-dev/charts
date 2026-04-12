@@ -1,7 +1,7 @@
 'use client'
 
 import type { StockWithQuotes, Quote } from '@/types'
-import { formatPrice, formatSpread, formatLiquidity, formatSlippage, estimateSlippage, spreadColorClass, timeAgo } from '@/lib/utils'
+import { formatPrice, formatSpread, formatLiquidity, formatSlippage, estimateSlippage, spreadColorClass, timeAgo, priceBasis, formatBasis } from '@/lib/utils'
 import VenuePill from './VenuePill'
 
 interface StockRowExpandedProps { stock: StockWithQuotes }
@@ -49,8 +49,10 @@ function HoursBadge({ hours }: { hours: Quote['tradingHours'] }) {
   )
 }
 
-function QuoteRow({ quote, isBest }: { quote: Quote; isBest: boolean }) {
+function QuoteRow({ quote, isBest, refPrice }: { quote: Quote; isBest: boolean; refPrice: number }) {
   const slippage = estimateSlippage(10_000, quote.liquidityUsd)
+  const basis    = refPrice > 0 ? priceBasis(quote.mid, refPrice) : null
+  const basisUp  = basis !== null && basis >= 0
 
   return (
     <tr style={{ borderTop: '1px solid rgba(255,255,255,0.04)', opacity: quote.stale ? 0.4 : 1 }}>
@@ -65,9 +67,17 @@ function QuoteRow({ quote, isBest }: { quote: Quote; isBest: boolean }) {
       {/* Chain */}
       <td className="py-3 px-3"><ChainBadge chain={quote.chain} /></td>
 
-      {/* Price */}
+      {/* Price + basis */}
       <td className="py-3 px-3 font-mono tabular-nums font-medium" style={{ fontSize: 13, color: '#f0f0f0' }}>
         {formatPrice(quote.mid)}
+        {basis !== null && (
+          <div
+            data-tooltip={`${basisUp ? 'Premium' : 'Discount'} vs off-chain reference price (${formatPrice(refPrice)})`}
+            style={{ fontSize: 10, fontWeight: 600, color: basisUp ? '#f87171' : '#34d399', cursor: 'help', marginTop: 1 }}
+          >
+            {formatBasis(basis)}
+          </div>
+        )}
       </td>
 
       {/* Spread */}
@@ -117,6 +127,7 @@ function QuoteRow({ quote, isBest }: { quote: Quote; isBest: boolean }) {
 }
 
 export default function StockRowExpanded({ stock }: StockRowExpandedProps) {
+  const { refPrice, refPriceSource } = stock
   const TH = (s: React.CSSProperties = {}) => ({
     fontSize: 10, color: '#444', fontWeight: 500, letterSpacing: '0.07em',
     textTransform: 'uppercase' as const, textAlign: 'left' as const, padding: '10px 12px',
@@ -132,7 +143,10 @@ export default function StockRowExpanded({ stock }: StockRowExpandedProps) {
               <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
                 <th style={{ ...TH(), paddingLeft: 48 }}>Venue</th>
                 <th style={TH()}>Chain</th>
-                <th style={TH()}>Price</th>
+                <th style={TH()}
+                  data-tooltip={refPrice > 0 ? `vs ${refPriceSource} (${formatPrice(refPrice)})` : undefined}>
+                  Price
+                </th>
                 <th style={TH()}>Spread</th>
                 <th style={{ ...TH() }} className="hidden lg:table-cell">Liquidity</th>
                 <th style={TH()} data-tooltip="Est. slippage for a $10,000 market order">Slip $10k</th>
@@ -149,6 +163,7 @@ export default function StockRowExpanded({ stock }: StockRowExpandedProps) {
                   key={`${quote.platform}-${quote.chain}`}
                   quote={quote}
                   isBest={quote.platform === stock.bestQuote.platform && quote.chain === stock.bestQuote.chain}
+                  refPrice={refPrice}
                 />
               ))}
             </tbody>

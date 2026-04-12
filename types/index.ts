@@ -26,6 +26,10 @@ export interface StockWithQuotes {
   assetType: 'equity' | 'etf'
   bestQuote: Quote
   allQuotes: Quote[]
+  /** Off-chain reference price (e.g. last NYSE close from Yahoo Finance / Polygon.io) */
+  refPrice: number
+  /** Human-readable source label */
+  refPriceSource: string
 }
 
 export interface QuotesApiResponse {

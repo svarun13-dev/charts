@@ -1,7 +1,7 @@
 'use client'
 
 import type { StockWithQuotes, Platform } from '@/types'
-import { formatPrice, formatSpread, formatSlippage, estimateSlippage, spreadColorClass, timeAgo } from '@/lib/utils'
+import { formatPrice, formatSpread, formatSlippage, estimateSlippage, spreadColorClass, timeAgo, priceBasis, formatBasis } from '@/lib/utils'
 import { DAILY_CHANGE } from '@/lib/mock-data'
 import VenuePill from './VenuePill'
 import StockRowExpanded from './StockRowExpanded'
@@ -22,6 +22,8 @@ export default function StockRow({ stock, isExpanded, onToggle }: StockRowProps)
   const changeUp   = changePct >= 0
   const slippage   = estimateSlippage(10_000, bestQuote.liquidityUsd)
   const staleColor = bestQuote.stale ? '#92400e' : '#555'
+  const basis      = stock.refPrice > 0 ? priceBasis(bestQuote.mid, stock.refPrice) : null
+  const basisUp    = basis !== null && basis >= 0  // true = premium, false = discount
 
   // Other venues: include full quote for spread delta
   const otherQuotes = stock.allQuotes.filter(
@@ -80,13 +82,28 @@ export default function StockRow({ stock, isExpanded, onToggle }: StockRowProps)
           </div>
         </td>
 
-        {/* Price + staleness timestamp */}
+        {/* Price + basis vs ref + staleness */}
         <td className="py-3 px-4 whitespace-nowrap">
           <div style={{ fontSize: 13, fontWeight: 500, color: '#f0f0f0', fontVariantNumeric: 'tabular-nums' }}>
             {formatPrice(bestQuote.mid)}
           </div>
-          <div style={{ fontSize: 10, color: staleColor, marginTop: 1 }}>
-            {bestQuote.stale ? '⚠ stale · ' : ''}{timeAgo(bestQuote.recordedAt)}
+          <div className="flex items-center gap-1.5 mt-0.5">
+            {basis !== null && (
+              <span
+                data-tooltip={`${basisUp ? 'Premium' : 'Discount'} vs ${stock.refPriceSource} (${formatPrice(stock.refPrice)}). ${basisUp ? 'On-chain costs more than market.' : 'On-chain is cheaper than market.'}`}
+                style={{
+                  fontSize: 10, fontWeight: 600, cursor: 'help',
+                  color: basisUp ? '#f87171' : '#34d399',
+                }}
+              >
+                {formatBasis(basis)} vs mkt
+              </span>
+            )}
+            {!basis && (
+              <span style={{ fontSize: 10, color: staleColor }}>
+                {bestQuote.stale ? '⚠ stale · ' : ''}{timeAgo(bestQuote.recordedAt)}
+              </span>
+            )}
           </div>
         </td>
 

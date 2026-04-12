@@ -2,6 +2,27 @@ import type { StockWithQuotes, Quote, EarnOpportunity } from '@/types'
 import { computeBestVenue } from './utils'
 import { PLATFORM_META } from './platform-info'
 
+/**
+ * Off-chain reference prices — last NYSE/NASDAQ close.
+ * In production these would come from Yahoo Finance, Polygon.io, or Finnhub.
+ * On-chain prices are compared against these to compute the basis (premium/discount).
+ */
+export const REF_PRICES: Record<string, number> = {
+  AAPL:    193.89,   // slightly above on-chain → on-chain trades at a discount
+  AMZN:    189.10,   // on-chain cheaper → discount
+  'BRK.B': 457.60,   // on-chain slightly above → small premium
+  COIN:    197.40,   // on-chain slightly above → small premium
+  GLD:     247.50,   // on-chain cheaper → discount
+  GOOGL:   172.30,   // on-chain slightly above ref → small premium
+  META:    492.80,   // on-chain slightly above → small premium
+  MSFT:    384.75,   // on-chain cheaper → discount
+  NFLX:    622.50,   // on-chain cheaper → discount
+  NVDA:    865.20,   // on-chain cheaper → discount
+  QQQ:     452.00,   // on-chain slightly above → small premium
+  SPY:     533.80,   // on-chain slightly above → small premium
+  TSLA:    172.90,   // on-chain cheaper → discount
+}
+
 // Mock 24h change % — replace with real historical data when backend is live
 export const DAILY_CHANGE: Record<string, number> = {
   AAPL:    +1.24,
@@ -145,7 +166,13 @@ export function getMockQuotes(): StockWithQuotes[] {
     const sorted = [...quotes].sort((a, b) =>
       a.spreadPct !== b.spreadPct ? a.spreadPct - b.spreadPct : b.liquidityUsd - a.liquidityUsd
     )
-    return { ticker, name, assetType, bestQuote: computeBestVenue(quotes), allQuotes: sorted }
+    return {
+      ticker, name, assetType,
+      bestQuote: computeBestVenue(quotes),
+      allQuotes: sorted,
+      refPrice: REF_PRICES[ticker] ?? 0,
+      refPriceSource: 'NYSE close',
+    }
   }).sort((a, b) => a.ticker.localeCompare(b.ticker))
 }
 

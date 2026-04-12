@@ -11,18 +11,16 @@ const QUOTE_AMOUNT_USDC = 1_000_000_000 // 1000 USDC in 6 decimals
 const JUPITER_QUOTE_URL = 'https://quote-api.jup.ag/v6/quote'
 
 // xStocks token mint addresses on Solana
-// Source: https://xstocks.com/tokens — update as new tokens launch
+// Source: xstocks.fi / Birdeye — update as new tokens launch
 const XSTOCKS_TOKENS: Record<string, { mint: string; decimals: number }> = {
-  TSLA:  { mint: 'xTSLAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', decimals: 6 },
-  AAPL:  { mint: 'xAAPLxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', decimals: 6 },
-  NVDA:  { mint: 'xNVDAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', decimals: 6 },
-  MSFT:  { mint: 'xMSFTxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', decimals: 6 },
-  GOOGL: { mint: 'xGOOGLxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', decimals: 6 },
-  AMZN:  { mint: 'xAMZNxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', decimals: 6 },
-  META:  { mint: 'xMETAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', decimals: 6 },
-  SPY:   { mint: 'xSPYXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', decimals: 6 },
-  COIN:  { mint: 'xCOINxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', decimals: 6 },
-  NFLX:  { mint: 'xNFLXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', decimals: 6 },
+  AAPL:  { mint: 'XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp', decimals: 6 },
+  NVDA:  { mint: 'Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh', decimals: 6 },
+  TSLA:  { mint: 'XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB', decimals: 6 },
+  GOOGL: { mint: 'XsCPL9dNWBMvFtTmwcCA5v3xWPSMEBCszbQdiLLq6aN', decimals: 6 },
+  AMZN:  { mint: 'Xs3eBt7uRfJX8QUs4suhyU8p2M6DoUDrJyWBa8LLZsg', decimals: 6 },
+  SPY:   { mint: 'XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W', decimals: 6 },
+  QQQ:   { mint: 'Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ', decimals: 6 },
+  // TODO: find mints for COIN, META, MSFT, NFLX once xStocks lists them
 }
 
 async function fetchJupiterQuote(

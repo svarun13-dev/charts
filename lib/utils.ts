@@ -79,3 +79,23 @@ export function timeAgo(isoString: string): string {
   if (minutes < 60) return `${minutes}m ago`
   return `${Math.floor(minutes / 60)}h ago`
 }
+
+/**
+ * Estimates slippage for a given trade size against a pool depth.
+ * Simple linear approximation: slippage = tradeUsd / liquidityUsd * 100
+ */
+export function estimateSlippage(tradeUsd: number, liquidityUsd: number): number {
+  if (liquidityUsd <= 0) return 0
+  return (tradeUsd / liquidityUsd) * 100
+}
+
+/** Formats slippage estimate for display. e.g. 0.024 → "~0.02%" */
+export function formatSlippage(slippagePct: number): string {
+  if (slippagePct < 0.01) return '<0.01%'
+  return `~${slippagePct.toFixed(2)}%`
+}
+
+/** Formats an APY percentage. e.g. 5.12 → "5.12%" */
+export function formatApy(apy: number): string {
+  return `${apy.toFixed(2)}%`
+}

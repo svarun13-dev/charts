@@ -1,5 +1,8 @@
 export type Platform = 'xstocks' | 'ondo' | 'backed' | 'swarm' | 'securitize'
 export type Chain = 'solana' | 'ethereum' | 'polygon'
+export type TradingHours = '24/7' | 'market-hours'
+export type RiskLevel = 'low' | 'medium' | 'high'
+export type EarnType = 'treasury' | 'lp' | 'lending'
 
 export interface Quote {
   platform: Platform
@@ -11,21 +14,41 @@ export interface Quote {
   liquidityUsd: number
   buyUrl: string
   minBuyUsd: number
-  stale: boolean       // true if quote is older than 90s
-  recordedAt: string   // ISO timestamp
+  kycRequired: boolean
+  tradingHours: TradingHours
+  stale: boolean
+  recordedAt: string
 }
 
 export interface StockWithQuotes {
   ticker: string
   name: string
   assetType: 'equity' | 'etf'
-  bestQuote: Quote         // lowest spreadPct, liquidityUsd as tiebreaker
-  allQuotes: Quote[]       // all venues, sorted by spreadPct asc
+  bestQuote: Quote
+  allQuotes: Quote[]
 }
 
 export interface QuotesApiResponse {
   updatedAt: string
   stocks: StockWithQuotes[]
+}
+
+export interface EarnOpportunity {
+  id: string
+  protocol: Platform
+  name: string
+  description: string
+  type: EarnType
+  apy: number
+  apyLabel?: string        // e.g. "variable" or "up to 14%"
+  tvlUsd: number
+  minDepositUsd: number
+  chain: Chain
+  depositAsset: string     // e.g. "USDC" or "USDC + TSLA"
+  risk: RiskLevel
+  kycRequired: boolean
+  tradingHours: TradingHours
+  url: string
 }
 
 // Raw shape stored in Redis

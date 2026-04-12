@@ -1,5 +1,6 @@
-import type { StockWithQuotes, Quote } from '@/types'
+import type { StockWithQuotes, Quote, EarnOpportunity } from '@/types'
 import { computeBestVenue } from './utils'
+import { PLATFORM_META } from './platform-info'
 
 // Mock 24h change % — replace with real historical data when backend is live
 export const DAILY_CHANGE: Record<string, number> = {
@@ -30,156 +31,273 @@ function makeQuote(
   const half = spreadPct / 2
   const bid = mid * (1 - half / 100)
   const ask = mid * (1 + half / 100)
+  const meta = PLATFORM_META[platform]
   return {
-    platform,
-    chain,
-    bid,
-    ask,
-    mid,
-    spreadPct,
-    liquidityUsd,
-    minBuyUsd,
-    buyUrl,
+    platform, chain, bid, ask, mid, spreadPct, liquidityUsd, minBuyUsd, buyUrl,
+    kycRequired: meta.kycRequired,
+    tradingHours: meta.tradingHours,
     stale: false,
     recordedAt: new Date().toISOString(),
   }
 }
 
-const RAW: {
-  ticker: string
-  name: string
-  assetType: 'equity' | 'etf'
-  quotes: Quote[]
-}[] = [
+const RAW: { ticker: string; name: string; assetType: 'equity' | 'etf'; quotes: Quote[] }[] = [
   {
-    ticker: 'AAPL',
-    name: 'Apple Inc.',
-    assetType: 'equity',
+    ticker: 'AAPL', name: 'Apple Inc.', assetType: 'equity',
     quotes: [
-      makeQuote('xstocks',    'solana',   193.42, 0.04,  38_200_000, 1,  'https://app.xstocks.com/trade/AAPL'),
+      makeQuote('xstocks',    'solana',   193.42, 0.04,  38_200_000,  1, 'https://app.xstocks.com/trade/AAPL'),
       makeQuote('backed',     'ethereum', 193.55, 0.12,  11_800_000, 10, 'https://backed.fi/products/bAAPL'),
       makeQuote('securitize', 'ethereum', 193.60, 0.18,  21_400_000, 50, 'https://securitize.io/invest/AAPL'),
     ],
   },
   {
-    ticker: 'AMZN',
-    name: 'Amazon.com Inc.',
-    assetType: 'equity',
+    ticker: 'AMZN', name: 'Amazon.com Inc.', assetType: 'equity',
     quotes: [
-      makeQuote('xstocks',    'solana',   188.74, 0.05,  29_100_000, 1,  'https://app.xstocks.com/trade/AMZN'),
+      makeQuote('xstocks',    'solana',   188.74, 0.05,  29_100_000,  1, 'https://app.xstocks.com/trade/AMZN'),
       makeQuote('securitize', 'ethereum', 188.90, 0.20,  16_300_000, 50, 'https://securitize.io/invest/AMZN'),
     ],
   },
   {
-    ticker: 'BRK.B',
-    name: 'Berkshire Hathaway Inc. B',
-    assetType: 'equity',
+    ticker: 'BRK.B', name: 'Berkshire Hathaway B', assetType: 'equity',
     quotes: [
       makeQuote('securitize', 'ethereum', 458.30, 0.22,  8_900_000, 50, 'https://securitize.io/invest/BRKB'),
     ],
   },
   {
-    ticker: 'COIN',
-    name: 'Coinbase Global Inc.',
-    assetType: 'equity',
+    ticker: 'COIN', name: 'Coinbase Global Inc.', assetType: 'equity',
     quotes: [
       makeQuote('xstocks', 'solana', 197.88, 0.06, 14_600_000, 1, 'https://app.xstocks.com/trade/COIN'),
     ],
   },
   {
-    ticker: 'GLD',
-    name: 'SPDR Gold Trust ETF',
-    assetType: 'etf',
+    ticker: 'GLD', name: 'SPDR Gold Trust ETF', assetType: 'etf',
     quotes: [
       makeQuote('backed', 'ethereum', 247.15, 0.10, 24_700_000, 10, 'https://backed.fi/products/bGLD'),
     ],
   },
   {
-    ticker: 'GOOGL',
-    name: 'Alphabet Inc.',
-    assetType: 'equity',
+    ticker: 'GOOGL', name: 'Alphabet Inc.', assetType: 'equity',
     quotes: [
-      makeQuote('xstocks', 'solana',   172.55, 0.04,  31_900_000, 1,  'https://app.xstocks.com/trade/GOOGL'),
+      makeQuote('xstocks', 'solana',   172.55, 0.04,  31_900_000,  1, 'https://app.xstocks.com/trade/GOOGL'),
       makeQuote('ondo',    'ethereum', 172.70, 0.10,  48_200_000, 50, 'https://ondo.finance/trade/GOOGL'),
     ],
   },
   {
-    ticker: 'META',
-    name: 'Meta Platforms Inc.',
-    assetType: 'equity',
+    ticker: 'META', name: 'Meta Platforms Inc.', assetType: 'equity',
     quotes: [
-      makeQuote('xstocks', 'solana',   493.12, 0.04,  27_500_000, 1,  'https://app.xstocks.com/trade/META'),
+      makeQuote('xstocks', 'solana',   493.12, 0.04,  27_500_000,  1, 'https://app.xstocks.com/trade/META'),
       makeQuote('backed',  'ethereum', 493.40, 0.15,   5_100_000, 10, 'https://backed.fi/products/bMETA'),
     ],
   },
   {
-    ticker: 'MSFT',
-    name: 'Microsoft Corporation',
-    assetType: 'equity',
+    ticker: 'MSFT', name: 'Microsoft Corporation', assetType: 'equity',
     quotes: [
-      makeQuote('xstocks', 'solana',   384.20, 0.04,  33_400_000, 1,  'https://app.xstocks.com/trade/MSFT'),
+      makeQuote('xstocks', 'solana',   384.20, 0.04,  33_400_000,  1, 'https://app.xstocks.com/trade/MSFT'),
       makeQuote('ondo',    'ethereum', 384.55, 0.10,  61_800_000, 50, 'https://ondo.finance/trade/MSFT'),
     ],
   },
   {
-    ticker: 'NFLX',
-    name: 'Netflix Inc.',
-    assetType: 'equity',
+    ticker: 'NFLX', name: 'Netflix Inc.', assetType: 'equity',
     quotes: [
       makeQuote('xstocks', 'solana',  621.80, 0.05, 18_300_000, 1, 'https://app.xstocks.com/trade/NFLX'),
       makeQuote('swarm',   'polygon', 622.10, 0.14,  1_400_000, 1, 'https://swarm.com/trade/NFLX'),
     ],
   },
   {
-    ticker: 'NVDA',
-    name: 'NVIDIA Corporation',
-    assetType: 'equity',
+    ticker: 'NVDA', name: 'NVIDIA Corporation', assetType: 'equity',
     quotes: [
       makeQuote('xstocks', 'solana',  864.40, 0.04, 52_100_000, 1, 'https://app.xstocks.com/trade/NVDA'),
       makeQuote('swarm',   'polygon', 864.90, 0.13,  2_800_000, 1, 'https://swarm.com/trade/NVDA'),
     ],
   },
   {
-    ticker: 'QQQ',
-    name: 'Invesco QQQ Trust',
-    assetType: 'etf',
+    ticker: 'QQQ', name: 'Invesco QQQ Trust', assetType: 'etf',
     quotes: [
       makeQuote('ondo', 'ethereum', 452.30, 0.10, 74_600_000, 50, 'https://ondo.finance/trade/QQQ'),
     ],
   },
   {
-    ticker: 'SPY',
-    name: 'SPDR S&P 500 ETF',
-    assetType: 'etf',
+    ticker: 'SPY', name: 'SPDR S&P 500 ETF', assetType: 'etf',
     quotes: [
-      makeQuote('xstocks', 'solana',   534.10, 0.04, 44_200_000, 1,  'https://app.xstocks.com/trade/SPY'),
+      makeQuote('xstocks', 'solana',   534.10, 0.04, 44_200_000,  1, 'https://app.xstocks.com/trade/SPY'),
       makeQuote('ondo',    'ethereum', 534.35, 0.10, 88_500_000, 50, 'https://ondo.finance/trade/SPY'),
     ],
   },
   {
-    ticker: 'TSLA',
-    name: 'Tesla Inc.',
-    assetType: 'equity',
+    ticker: 'TSLA', name: 'Tesla Inc.', assetType: 'equity',
     quotes: [
-      makeQuote('xstocks', 'solana',   172.41, 0.04, 42_100_000, 1,  'https://app.xstocks.com/trade/TSLA'),
+      makeQuote('xstocks', 'solana',   172.41, 0.04, 42_100_000,  1, 'https://app.xstocks.com/trade/TSLA'),
       makeQuote('backed',  'ethereum', 172.55, 0.12,  8_400_000, 10, 'https://backed.fi/products/bTSLA'),
-      makeQuote('swarm',   'polygon',  172.60, 0.16,  3_100_000, 1,  'https://swarm.com/trade/TSLA'),
+      makeQuote('swarm',   'polygon',  172.60, 0.16,  3_100_000,  1, 'https://swarm.com/trade/TSLA'),
     ],
   },
 ]
 
 export function getMockQuotes(): StockWithQuotes[] {
   return RAW.map(({ ticker, name, assetType, quotes }) => {
-    const sorted = [...quotes].sort((a, b) => {
-      if (a.spreadPct !== b.spreadPct) return a.spreadPct - b.spreadPct
-      return b.liquidityUsd - a.liquidityUsd
-    })
-    return {
-      ticker,
-      name,
-      assetType,
-      bestQuote: computeBestVenue(quotes),
-      allQuotes: sorted,
-    }
+    const sorted = [...quotes].sort((a, b) =>
+      a.spreadPct !== b.spreadPct ? a.spreadPct - b.spreadPct : b.liquidityUsd - a.liquidityUsd
+    )
+    return { ticker, name, assetType, bestQuote: computeBestVenue(quotes), allQuotes: sorted }
   }).sort((a, b) => a.ticker.localeCompare(b.ticker))
 }
+
+// ---------------------------------------------------------------------------
+// Earn opportunities mock data
+// ---------------------------------------------------------------------------
+
+export const EARN_OPPORTUNITIES: EarnOpportunity[] = [
+  // --- Treasury / yield products ---
+  {
+    id: 'ondo-usdy',
+    protocol: 'ondo',
+    name: 'USDY',
+    description: 'Tokenised US Treasury yield, redeemable on-demand. Backed by short-term T-bills.',
+    type: 'treasury',
+    apy: 5.12,
+    tvlUsd: 432_000_000,
+    minDepositUsd: 500,
+    chain: 'ethereum',
+    depositAsset: 'USDC',
+    risk: 'low',
+    kycRequired: true,
+    tradingHours: '24/7',
+    url: 'https://ondo.finance/usdy',
+  },
+  {
+    id: 'ondo-ousg',
+    protocol: 'ondo',
+    name: 'OUSG',
+    description: 'Tokenised iShares Short Treasury Bond ETF. Institutional minimum.',
+    type: 'treasury',
+    apy: 5.04,
+    tvlUsd: 289_000_000,
+    minDepositUsd: 100_000,
+    chain: 'ethereum',
+    depositAsset: 'USDC',
+    risk: 'low',
+    kycRequired: true,
+    tradingHours: 'market-hours',
+    url: 'https://ondo.finance/ousg',
+  },
+  {
+    id: 'backed-ibta',
+    protocol: 'backed',
+    name: 'bIBTA',
+    description: 'Tokenised iShares $ Treasury Bond ETF. Daily NAV, redeemable via Backed.',
+    type: 'treasury',
+    apy: 4.81,
+    tvlUsd: 18_400_000,
+    minDepositUsd: 100,
+    chain: 'ethereum',
+    depositAsset: 'USDC',
+    risk: 'low',
+    kycRequired: true,
+    tradingHours: 'market-hours',
+    url: 'https://backed.fi/products/bIBTA',
+  },
+  // --- LP positions ---
+  {
+    id: 'xstocks-tsla-lp',
+    protocol: 'xstocks',
+    name: 'TSLA / USDC LP',
+    description: 'Earn swap fees providing liquidity to the TSLA pool on Jupiter. Subject to impermanent loss.',
+    type: 'lp',
+    apy: 12.4,
+    apyLabel: '~12.4%',
+    tvlUsd: 8_200_000,
+    minDepositUsd: 1,
+    chain: 'solana',
+    depositAsset: 'TSLA + USDC',
+    risk: 'medium',
+    kycRequired: false,
+    tradingHours: '24/7',
+    url: 'https://app.xstocks.com/pools/TSLA',
+  },
+  {
+    id: 'xstocks-nvda-lp',
+    protocol: 'xstocks',
+    name: 'NVDA / USDC LP',
+    description: 'Earn swap fees providing liquidity to the NVDA pool on Jupiter.',
+    type: 'lp',
+    apy: 14.2,
+    apyLabel: '~14.2%',
+    tvlUsd: 4_100_000,
+    minDepositUsd: 1,
+    chain: 'solana',
+    depositAsset: 'NVDA + USDC',
+    risk: 'medium',
+    kycRequired: false,
+    tradingHours: '24/7',
+    url: 'https://app.xstocks.com/pools/NVDA',
+  },
+  {
+    id: 'xstocks-spy-lp',
+    protocol: 'xstocks',
+    name: 'SPY / USDC LP',
+    description: 'Lower-volatility LP position. SPY tracks the S&P 500 so impermanent loss is reduced.',
+    type: 'lp',
+    apy: 8.6,
+    apyLabel: '~8.6%',
+    tvlUsd: 11_300_000,
+    minDepositUsd: 1,
+    chain: 'solana',
+    depositAsset: 'SPY + USDC',
+    risk: 'medium',
+    kycRequired: false,
+    tradingHours: '24/7',
+    url: 'https://app.xstocks.com/pools/SPY',
+  },
+  {
+    id: 'ondo-msft-lp',
+    protocol: 'ondo',
+    name: 'MSFT / USDC LP',
+    description: 'Concentrated Uniswap v3 position on the MSFT pool. Fee tier 0.05%.',
+    type: 'lp',
+    apy: 7.2,
+    apyLabel: '~7.2%',
+    tvlUsd: 61_800_000,
+    minDepositUsd: 50,
+    chain: 'ethereum',
+    depositAsset: 'MSFT + USDC',
+    risk: 'medium',
+    kycRequired: true,
+    tradingHours: '24/7',
+    url: 'https://ondo.finance/pools/MSFT',
+  },
+  {
+    id: 'swarm-nflx-lp',
+    protocol: 'swarm',
+    name: 'NFLX / USDC LP',
+    description: 'QuickSwap v3 LP on Polygon. No KYC, low gas fees.',
+    type: 'lp',
+    apy: 9.8,
+    apyLabel: '~9.8%',
+    tvlUsd: 1_400_000,
+    minDepositUsd: 1,
+    chain: 'polygon',
+    depositAsset: 'NFLX + USDC',
+    risk: 'medium',
+    kycRequired: false,
+    tradingHours: '24/7',
+    url: 'https://swarm.com/pools/NFLX',
+  },
+  // --- Lending ---
+  {
+    id: 'ondo-lending',
+    protocol: 'ondo',
+    name: 'RWA Lending',
+    description: 'Lend USDC to verified institutions using tokenised securities as collateral. Fixed-rate tranches.',
+    type: 'lending',
+    apy: 6.8,
+    apyLabel: '~6.8%',
+    tvlUsd: 94_000_000,
+    minDepositUsd: 10_000,
+    chain: 'ethereum',
+    depositAsset: 'USDC',
+    risk: 'low',
+    kycRequired: true,
+    tradingHours: 'market-hours',
+    url: 'https://ondo.finance/lending',
+  },
+]

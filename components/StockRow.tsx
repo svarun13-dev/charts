@@ -2,6 +2,7 @@
 
 import type { StockWithQuotes, Platform } from '@/types'
 import { formatPrice, formatSpread, formatLiquidity, spreadColorClass } from '@/lib/utils'
+import { DAILY_CHANGE } from '@/lib/mock-data'
 import VenuePill from './VenuePill'
 import StockRowExpanded from './StockRowExpanded'
 import StockLogo from './StockLogo'
@@ -14,10 +15,13 @@ interface StockRowProps {
 
 export default function StockRow({ stock, isExpanded, onToggle }: StockRowProps) {
   const { bestQuote } = stock
+  const changePct = DAILY_CHANGE[stock.ticker] ?? 0
+  const changeUp = changePct >= 0
+  const changeColor = changeUp ? '#34d399' : '#f87171'
 
   const otherPlatforms = stock.allQuotes
-    .filter((q) => !(q.platform === bestQuote.platform && q.chain === bestQuote.chain))
-    .map((q) => q.platform)
+    .filter(q => !(q.platform === bestQuote.platform && q.chain === bestQuote.chain))
+    .map(q => q.platform)
 
   return (
     <>
@@ -37,16 +41,8 @@ export default function StockRow({ stock, isExpanded, onToggle }: StockRowProps)
           <div className="flex items-center gap-3">
             <svg
               className="flex-shrink-0 transition-transform"
-              style={{
-                width: 10,
-                height: 10,
-                color: '#555',
-                transform: isExpanded ? 'rotate(90deg)' : 'none',
-              }}
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2.5}
+              style={{ width: 10, height: 10, color: '#555', transform: isExpanded ? 'rotate(90deg)' : 'none' }}
+              fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>
@@ -56,9 +52,7 @@ export default function StockRow({ stock, isExpanded, onToggle }: StockRowProps)
                 {stock.ticker}
               </span>
               {stock.assetType === 'etf' && (
-                <span style={{ fontSize: 9, color: '#666', fontWeight: 500, letterSpacing: '0.06em', lineHeight: 1.4 }}>
-                  ETF
-                </span>
+                <span style={{ fontSize: 9, color: '#666', fontWeight: 500, letterSpacing: '0.06em', lineHeight: 1.4 }}>ETF</span>
               )}
             </div>
           </div>
@@ -79,6 +73,13 @@ export default function StockRow({ stock, isExpanded, onToggle }: StockRowProps)
           {formatPrice(bestQuote.mid)}
         </td>
 
+        {/* 24h change */}
+        <td className="py-3 px-4 tabular-nums whitespace-nowrap">
+          <span style={{ fontSize: 12, fontWeight: 600, color: changeColor }}>
+            {changeUp ? '+' : ''}{changePct.toFixed(2)}%
+          </span>
+        </td>
+
         {/* Spread */}
         <td className={`py-3 px-4 font-mono tabular-nums font-semibold text-xs ${spreadColorClass(bestQuote.spreadPct)}`}>
           {formatSpread(bestQuote.spreadPct)}
@@ -92,7 +93,7 @@ export default function StockRow({ stock, isExpanded, onToggle }: StockRowProps)
         {/* Other venues */}
         <td className="py-3 pl-4 pr-5 hidden md:table-cell">
           <div className="flex items-center gap-1.5">
-            {otherPlatforms.map((p) => (
+            {otherPlatforms.map(p => (
               <VenuePill key={p} platform={p as Platform} size="xs" muted />
             ))}
           </div>

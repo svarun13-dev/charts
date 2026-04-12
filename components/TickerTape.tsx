@@ -3,23 +3,7 @@
 import { useEffect, useState } from 'react'
 import type { QuotesApiResponse, StockWithQuotes } from '@/types'
 import { formatPrice } from '@/lib/utils'
-
-// Mock daily change % — replace with real data when backend is live
-const MOCK_CHANGE: Record<string, number> = {
-  AAPL:    +1.24,
-  AMZN:    -0.87,
-  'BRK.B': +0.41,
-  COIN:    +3.82,
-  GLD:     +0.63,
-  GOOGL:   -1.15,
-  META:    +2.07,
-  MSFT:    +0.93,
-  NFLX:    -2.31,
-  NVDA:    +4.56,
-  QQQ:     +0.78,
-  SPY:     +0.52,
-  TSLA:    -1.94,
-}
+import { DAILY_CHANGE } from '@/lib/mock-data'
 
 interface TickerItem {
   ticker: string
@@ -66,7 +50,7 @@ export default function TickerTape() {
           data.stocks.map((s: StockWithQuotes) => ({
             ticker: s.ticker,
             mid: s.bestQuote.mid,
-            changePct: MOCK_CHANGE[s.ticker] ?? 0,
+            changePct: DAILY_CHANGE[s.ticker] ?? 0,
           }))
         )
       } catch {

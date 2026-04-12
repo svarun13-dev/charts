@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import TickerTape from '@/components/TickerTape'
+import MarketStatus from '@/components/MarketStatus'
 
 export const metadata: Metadata = {
   title: 'RWA Stocks',
@@ -29,9 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 Beta
               </span>
             </div>
-            <span className="text-xs" style={{ color: '#444' }}>
-              Refreshes every 30s
-            </span>
+            <MarketStatus />
           </div>
         </header>
 

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import TickerTape from '@/components/TickerTape'
 
 export const metadata: Metadata = {
   title: 'RWA Stocks',
@@ -33,6 +34,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </span>
           </div>
         </header>
+
+        <TickerTape />
+
         <main className="max-w-6xl mx-auto px-6 py-10">
           {children}
         </main>

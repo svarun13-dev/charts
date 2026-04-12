@@ -64,9 +64,9 @@ export function isStale(recordedAt: string): boolean {
  * green < 0.1%, amber 0.1–0.2%, red > 0.2%
  */
 export function spreadColorClass(spreadPct: number): string {
-  if (spreadPct < 0.1) return 'text-green-400'
+  if (spreadPct < 0.1) return 'text-emerald-400'
   if (spreadPct <= 0.2) return 'text-amber-400'
-  return 'text-red-400'
+  return 'text-rose-400'
 }
 
 /**

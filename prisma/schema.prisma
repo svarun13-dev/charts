@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Asset {
+  id        String  @id @default(cuid())
+  ticker    String  @unique      // "TSLA"
+  name      String               // "Tesla Inc."
+  assetType String               // "equity" | "etf"
+  isin      String?              // underlying ISIN if known
+
+  platforms PlatformAsset[]
+}
+
+model PlatformAsset {
+  id              String @id @default(cuid())
+  assetId         String
+  asset           Asset  @relation(fields: [assetId], references: [id])
+
+  platform        String  // "xstocks" | "ondo" | "backed" | "swarm" | "securitize"
+  chain           String  // "solana" | "ethereum" | "polygon"
+  contractAddress String  // token contract or pool address
+  minBuyUsd       Float   // minimum purchase in USD
+  buyUrl          String  // deep link to buy on the platform
+  kycRequired     Boolean @default(true)
+
+  quotes Quote[]
+}
+
+model Quote {
+  id              String        @id @default(cuid())
+  platformAssetId String
+  platformAsset   PlatformAsset @relation(fields: [platformAssetId], references: [id])
+
+  bid         Float
+  ask         Float
+  mid         Float
+  spreadPct   Float    // (ask - bid) / mid * 100
+  liquidityUsd Float   // pool depth within ±2% of mid
+  recordedAt  DateTime @default(now())
+
+  @@index([platformAssetId, recordedAt])
+}

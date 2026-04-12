@@ -88,7 +88,7 @@ function QuoteRow({ quote, isBest }: { quote: Quote; isBest: boolean }) {
 
       {/* Min buy */}
       <td className="py-3 px-3 text-xs" style={{ color: '#999' }}>
-        ${quote.minBuyUsd === 1 ? '1' : quote.minBuyUsd.toFixed(0)}
+        ${quote.minBuyUsd >= 1000 ? `${(quote.minBuyUsd / 1000).toFixed(0)}k` : quote.minBuyUsd.toFixed(0)}
       </td>
 
       {/* KYC */}

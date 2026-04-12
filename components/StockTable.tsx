@@ -13,7 +13,7 @@ type SortKey   = 'ticker' | 'price' | 'change' | 'spread' | 'liquidity'
 type SortDir   = 'asc' | 'desc'
 type AssetFilter = 'all' | 'equity' | 'etf'
 type ChainFilter = 'all' | Chain
-type MinBuyFilter = 'any' | 1 | 10 | 50
+type MinBuyFilter = 'any' | 100 | 1000 | 10000 | 100000 | 1000000
 
 const COL_STYLE: React.CSSProperties = {
   fontSize: 10, fontWeight: 500, color: '#555',
@@ -237,10 +237,12 @@ export default function StockTable() {
             value={minBuyFilter}
             onChange={v => setMinBuyFilter(v as MinBuyFilter)}
             options={[
-              { key: 'any', label: 'Any' },
-              { key: 1,     label: '≤$1' },
-              { key: 10,    label: '≤$10' },
-              { key: 50,    label: '≤$50' },
+              { key: 'any',     label: 'Any'   },
+              { key: 100,       label: '≤$100' },
+              { key: 1000,      label: '≤$1k'  },
+              { key: 10000,     label: '≤$10k' },
+              { key: 100000,    label: '≤$100k' },
+              { key: 1000000,   label: '≤$1M'  },
             ]}
           />
           <SearchBar value={search} onChange={setSearch} count={filteredStocks.length} />

@@ -37,6 +37,37 @@ export interface QuotesApiResponse {
   stocks: StockWithQuotes[]
 }
 
+/** A single platform-listing event — emitted each time a stock appears on a new venue */
+export interface ListingEvent {
+  id: string           // e.g. "aapl-xstocks-solana"
+  ticker: string
+  name: string
+  assetType: 'equity' | 'etf'
+  platform: Platform
+  chain: Chain
+  listedAt: string     // ISO timestamp
+  priceAtListing: number
+  liquidityUsd: number
+  kycRequired: boolean
+  tradingHours: TradingHours
+  buyUrl: string
+}
+
+/** Aggregated trending entry for a ticker */
+export interface TrendingStock {
+  ticker: string
+  name: string
+  assetType: 'equity' | 'etf'
+  changePct: number          // 24h price change
+  totalLiquidityUsd: number  // sum across all venues
+  venueCount: number
+  bestSpreadPct: number
+  bestPlatform: Platform
+  bestChain: Chain
+  price: number
+  score: number              // composite trending score
+}
+
 export interface EarnOpportunity {
   id: string
   protocol: Platform

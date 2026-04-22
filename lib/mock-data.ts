@@ -1,4 +1,4 @@
-import type { StockWithQuotes, Quote, EarnOpportunity } from '@/types'
+import type { StockWithQuotes, Quote, EarnOpportunity, ListingEvent, TrendingStock } from '@/types'
 import { computeBestVenue } from './utils'
 import { PLATFORM_META } from './platform-info'
 
@@ -174,6 +174,166 @@ export function getMockQuotes(): StockWithQuotes[] {
       refPriceSource: 'NYSE close',
     }
   }).sort((a, b) => a.ticker.localeCompare(b.ticker))
+}
+
+// ---------------------------------------------------------------------------
+// Listing events — one entry per platform/chain debut of a stock.
+// Sorted newest-first. In production these come from platform APIs.
+// "today" = 2026-04-22 for mock purposes.
+// ---------------------------------------------------------------------------
+
+function daysAgo(n: number): string {
+  const d = new Date('2026-04-22T12:00:00Z')
+  d.setDate(d.getDate() - n)
+  return d.toISOString()
+}
+
+export const LISTING_EVENTS: ListingEvent[] = [
+  // Very recent (< 7 days)
+  {
+    id: 'brkb-securitize-ethereum',
+    ticker: 'BRK.B', name: 'Berkshire Hathaway B', assetType: 'equity',
+    platform: 'securitize', chain: 'ethereum',
+    listedAt: daysAgo(2), priceAtListing: 457.10, liquidityUsd: 8_900_000,
+    kycRequired: true, tradingHours: 'market-hours',
+    buyUrl: 'https://securitize.io/invest/BRKB',
+  },
+  {
+    id: 'coin-xstocks-solana',
+    ticker: 'COIN', name: 'Coinbase Global Inc.', assetType: 'equity',
+    platform: 'xstocks', chain: 'solana',
+    listedAt: daysAgo(5), priceAtListing: 195.20, liquidityUsd: 14_600_000,
+    kycRequired: false, tradingHours: '24/7',
+    buyUrl: 'https://app.xstocks.com/trade/COIN',
+  },
+  // This week (7–14 days)
+  {
+    id: 'gld-backed-ethereum',
+    ticker: 'GLD', name: 'SPDR Gold Trust ETF', assetType: 'etf',
+    platform: 'backed', chain: 'ethereum',
+    listedAt: daysAgo(9), priceAtListing: 244.80, liquidityUsd: 24_700_000,
+    kycRequired: true, tradingHours: 'market-hours',
+    buyUrl: 'https://backed.fi/products/bGLD',
+  },
+  {
+    id: 'nflx-swarm-polygon',
+    ticker: 'NFLX', name: 'Netflix Inc.', assetType: 'equity',
+    platform: 'swarm', chain: 'polygon',
+    listedAt: daysAgo(12), priceAtListing: 618.00, liquidityUsd: 1_400_000,
+    kycRequired: false, tradingHours: '24/7',
+    buyUrl: 'https://swarm.com/trade/NFLX',
+  },
+  // This month (14–30 days)
+  {
+    id: 'meta-backed-ethereum',
+    ticker: 'META', name: 'Meta Platforms Inc.', assetType: 'equity',
+    platform: 'backed', chain: 'ethereum',
+    listedAt: daysAgo(18), priceAtListing: 488.30, liquidityUsd: 5_100_000,
+    kycRequired: true, tradingHours: 'market-hours',
+    buyUrl: 'https://backed.fi/products/bMETA',
+  },
+  {
+    id: 'msft-ondo-ethereum',
+    ticker: 'MSFT', name: 'Microsoft Corporation', assetType: 'equity',
+    platform: 'ondo', chain: 'ethereum',
+    listedAt: daysAgo(24), priceAtListing: 381.00, liquidityUsd: 61_800_000,
+    kycRequired: true, tradingHours: '24/7',
+    buyUrl: 'https://ondo.finance/trade/MSFT',
+  },
+  {
+    id: 'amzn-securitize-ethereum',
+    ticker: 'AMZN', name: 'Amazon.com Inc.', assetType: 'equity',
+    platform: 'securitize', chain: 'ethereum',
+    listedAt: daysAgo(28), priceAtListing: 186.50, liquidityUsd: 16_300_000,
+    kycRequired: true, tradingHours: 'market-hours',
+    buyUrl: 'https://securitize.io/invest/AMZN',
+  },
+  // Older (> 30 days — established)
+  {
+    id: 'spy-ondo-ethereum',
+    ticker: 'SPY', name: 'SPDR S&P 500 ETF', assetType: 'etf',
+    platform: 'ondo', chain: 'ethereum',
+    listedAt: daysAgo(45), priceAtListing: 520.00, liquidityUsd: 88_500_000,
+    kycRequired: true, tradingHours: '24/7',
+    buyUrl: 'https://ondo.finance/trade/SPY',
+  },
+  {
+    id: 'nvda-swarm-polygon',
+    ticker: 'NVDA', name: 'NVIDIA Corporation', assetType: 'equity',
+    platform: 'swarm', chain: 'polygon',
+    listedAt: daysAgo(52), priceAtListing: 820.00, liquidityUsd: 2_800_000,
+    kycRequired: false, tradingHours: '24/7',
+    buyUrl: 'https://swarm.com/trade/NVDA',
+  },
+  {
+    id: 'googl-ondo-ethereum',
+    ticker: 'GOOGL', name: 'Alphabet Inc.', assetType: 'equity',
+    platform: 'ondo', chain: 'ethereum',
+    listedAt: daysAgo(60), priceAtListing: 168.00, liquidityUsd: 48_200_000,
+    kycRequired: true, tradingHours: '24/7',
+    buyUrl: 'https://ondo.finance/trade/GOOGL',
+  },
+  {
+    id: 'aapl-backed-ethereum',
+    ticker: 'AAPL', name: 'Apple Inc.', assetType: 'equity',
+    platform: 'backed', chain: 'ethereum',
+    listedAt: daysAgo(90), priceAtListing: 185.00, liquidityUsd: 11_800_000,
+    kycRequired: true, tradingHours: 'market-hours',
+    buyUrl: 'https://backed.fi/products/bAAPL',
+  },
+  {
+    id: 'tsla-xstocks-solana',
+    ticker: 'TSLA', name: 'Tesla Inc.', assetType: 'equity',
+    platform: 'xstocks', chain: 'solana',
+    listedAt: daysAgo(120), priceAtListing: 185.00, liquidityUsd: 42_100_000,
+    kycRequired: false, tradingHours: '24/7',
+    buyUrl: 'https://app.xstocks.com/trade/TSLA',
+  },
+  {
+    id: 'nvda-xstocks-solana',
+    ticker: 'NVDA', name: 'NVIDIA Corporation', assetType: 'equity',
+    platform: 'xstocks', chain: 'solana',
+    listedAt: daysAgo(150), priceAtListing: 780.00, liquidityUsd: 52_100_000,
+    kycRequired: false, tradingHours: '24/7',
+    buyUrl: 'https://app.xstocks.com/trade/NVDA',
+  },
+  {
+    id: 'spy-xstocks-solana',
+    ticker: 'SPY', name: 'SPDR S&P 500 ETF', assetType: 'etf',
+    platform: 'xstocks', chain: 'solana',
+    listedAt: daysAgo(180), priceAtListing: 510.00, liquidityUsd: 44_200_000,
+    kycRequired: false, tradingHours: '24/7',
+    buyUrl: 'https://app.xstocks.com/trade/SPY',
+  },
+]
+
+export function getTrendingStocks(): TrendingStock[] {
+  const stocks = getMockQuotes()
+  return stocks
+    .map(s => {
+      const changePct    = DAILY_CHANGE[s.ticker] ?? 0
+      const totalLiq     = s.allQuotes.reduce((sum, q) => sum + q.liquidityUsd, 0)
+      const venueCount   = s.allQuotes.length
+      // Score: liquidity (log-weighted) + abs(change) + venue count bonus
+      const score =
+        Math.log10(Math.max(totalLiq, 1)) * 10 +
+        Math.abs(changePct) * 5 +
+        venueCount * 3
+      return {
+        ticker: s.ticker,
+        name: s.name,
+        assetType: s.assetType,
+        changePct,
+        totalLiquidityUsd: totalLiq,
+        venueCount,
+        bestSpreadPct: s.bestQuote.spreadPct,
+        bestPlatform: s.bestQuote.platform,
+        bestChain: s.bestQuote.chain,
+        price: s.bestQuote.mid,
+        score,
+      }
+    })
+    .sort((a, b) => b.score - a.score)
 }
 
 // ---------------------------------------------------------------------------

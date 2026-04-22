@@ -4,8 +4,9 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 const TABS = [
-  { href: '/',     label: 'Stocks' },
-  { href: '/earn', label: 'Earn'   },
+  { href: '/',        label: 'Discover' },
+  { href: '/markets', label: 'Markets'  },
+  { href: '/earn',    label: 'Earn'     },
 ]
 
 export default function NavTabs() {
@@ -14,7 +15,7 @@ export default function NavTabs() {
   return (
     <nav className="flex items-center gap-1">
       {TABS.map(tab => {
-        const active = tab.href === '/' ? pathname === '/' : pathname.startsWith(tab.href)
+        const active = tab.href === '/' ? pathname === '/' : pathname === tab.href || pathname.startsWith(tab.href + '/')
         return (
           <Link
             key={tab.href}

@@ -16,14 +16,14 @@ type ChainFilter = 'all' | Chain
 type MinBuyFilter = 'any' | 100 | 1000 | 10000 | 100000 | 1000000
 
 const COL_STYLE: React.CSSProperties = {
-  fontSize: 10, fontWeight: 500, color: '#555',
-  letterSpacing: '0.07em', textTransform: 'uppercase',
+  fontSize: 9, fontWeight: 600, color: 'var(--text-3)',
+  letterSpacing: '0.1em', textTransform: 'uppercase',
   paddingBottom: 10, userSelect: 'none',
 }
 
 function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
   return (
-    <span style={{ marginLeft: 3, opacity: active ? 1 : 0.3, fontSize: 8 }}>
+    <span style={{ marginLeft: 3, opacity: active ? 1 : 0.25, fontSize: 7 }}>
       {active && dir === 'desc' ? '▼' : '▲'}
     </span>
   )
@@ -37,7 +37,10 @@ function FilterGroup({ label, options, value, onChange }: {
 }) {
   return (
     <div className="flex items-center gap-1">
-      <span style={{ fontSize: 10, color: '#444', fontWeight: 500, letterSpacing: '0.06em', textTransform: 'uppercase', marginRight: 4 }}>
+      <span style={{
+        fontSize: 9, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase',
+        color: 'var(--text-3)', marginRight: 4,
+      }}>
         {label}
       </span>
       {options.map(opt => (
@@ -45,12 +48,12 @@ function FilterGroup({ label, options, value, onChange }: {
           key={opt.key}
           onClick={() => onChange(opt.key)}
           style={{
-            fontSize: 11, fontWeight: 500, padding: '2px 8px', borderRadius: 4,
-            border: '1px solid',
-            borderColor: value === opt.key ? 'rgba(255,255,255,0.15)' : 'transparent',
-            background: value === opt.key ? 'rgba(255,255,255,0.06)' : 'transparent',
-            color: value === opt.key ? '#ddd' : '#555',
-            cursor: 'pointer', transition: 'all 0.1s',
+            fontSize: 9, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase',
+            padding: '2px 8px', borderRadius: 2, border: '1px solid', cursor: 'pointer',
+            transition: 'all 0.1s',
+            borderColor: value === opt.key ? 'var(--amber-border)' : 'transparent',
+            background:   value === opt.key ? 'var(--amber-dim)'   : 'transparent',
+            color:        value === opt.key ? 'var(--amber-bright)' : 'var(--text-2)',
           }}
         >
           {opt.label}
@@ -77,13 +80,13 @@ function StatsStrip({ stocks }: { stocks: StockWithQuotes[] }) {
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-px mb-8"
-      style={{ background: 'rgba(255,255,255,0.05)', borderRadius: 8, overflow: 'hidden' }}>
+      style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 3, overflow: 'hidden' }}>
       {stats.map(({ label, value }) => (
-        <div key={label} style={{ background: '#0a0a0a', padding: '14px 18px' }}>
-          <div style={{ fontSize: 10, color: '#444', fontWeight: 500, letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 6 }}>
+        <div key={label} style={{ background: 'var(--surface)', padding: '12px 16px' }}>
+          <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-3)', marginBottom: 5 }}>
             {label}
           </div>
-          <div style={{ fontSize: 15, fontWeight: 600, color: '#e5e5e5', letterSpacing: '-0.01em' }}>
+          <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)', letterSpacing: '-0.01em', fontFamily: 'var(--font-mono, monospace)' }}>
             {value}
           </div>
         </div>

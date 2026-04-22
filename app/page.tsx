@@ -12,32 +12,52 @@ function statsFromListings() {
 }
 
 export default function DiscoverPage() {
-  const { newThisWeek, newThisMonth, platforms, tickers } = statsFromListings()
+  const s = statsFromListings()
 
   return (
     <div>
       {/* Page header */}
-      <div className="mb-8">
-        <h1 style={{ fontSize: 20, fontWeight: 600, color: '#fff', letterSpacing: '-0.02em' }}>
-          Discover
-        </h1>
-        <p style={{ marginTop: 4, fontSize: 13, color: '#555' }}>
-          Track new tokenized stock listings across all RWA platforms in real time.
+      <div className="mb-8" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: 20 }}>
+        <div className="flex items-baseline gap-3">
+          <h1 style={{
+            fontSize: 11, fontWeight: 700, letterSpacing: '0.14em',
+            textTransform: 'uppercase', color: 'var(--amber)',
+            fontFamily: 'var(--font-mono, monospace)',
+          }}>
+            Discover
+          </h1>
+          <span style={{ fontSize: 10, color: 'var(--text-3)', letterSpacing: '0.06em' }}>
+            TOKENIZED EQUITY LISTINGS · ALL PLATFORMS
+          </span>
+        </div>
+        <p style={{ marginTop: 4, fontSize: 12, color: 'var(--text-2)' }}>
+          Monitor new tokenized stock listings across xStocks, Ondo, Backed, Swarm, and Securitize.
         </p>
       </div>
 
-      {/* Stats strip */}
+      {/* Stats strip — Bloomberg-style: label above, value below */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-px mb-10"
-        style={{ background: 'rgba(255,255,255,0.05)', borderRadius: 8, overflow: 'hidden' }}>
+        style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 3, overflow: 'hidden' }}>
         {[
-          { label: 'New this week',  value: newThisWeek.toString()  },
-          { label: 'New this month', value: newThisMonth.toString() },
-          { label: 'Platforms',      value: `${platforms} active`   },
-          { label: 'Total assets',   value: `${tickers} stocks`     },
-        ].map(({ label, value }) => (
-          <div key={label} style={{ background: '#0a0a0a', padding: '14px 18px' }}>
-            <div style={{ fontSize: 10, color: '#444', fontWeight: 500, letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 6 }}>{label}</div>
-            <div style={{ fontSize: 15, fontWeight: 600, color: '#e5e5e5', letterSpacing: '-0.01em' }}>{value}</div>
+          { label: 'New This Week',  value: s.newThisWeek.toString(),  accent: s.newThisWeek > 0 },
+          { label: 'New This Month', value: s.newThisMonth.toString(), accent: false },
+          { label: 'Active Platforms', value: `${s.platforms}`,        accent: false },
+          { label: 'Total Assets',   value: `${s.tickers} stocks`,     accent: false },
+        ].map(({ label, value, accent }) => (
+          <div key={label} style={{ background: 'var(--surface)', padding: '12px 16px' }}>
+            <div style={{
+              fontSize: 9, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase',
+              color: 'var(--text-3)', marginBottom: 5,
+            }}>
+              {label}
+            </div>
+            <div style={{
+              fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em',
+              color: accent ? 'var(--amber-bright)' : 'var(--text)',
+              fontFamily: 'var(--font-mono, monospace)',
+            }}>
+              {value}
+            </div>
           </div>
         ))}
       </div>
